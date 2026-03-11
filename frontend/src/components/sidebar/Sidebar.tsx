@@ -42,13 +42,6 @@ export function Sidebar({ active, onSelect }: SidebarProps) {
           </button>
         ))}
       </nav>
-      <div className="sidebar-footer card">
-        <span className="eyebrow-label">Workspace</span>
-        <strong>Finance Control</strong>
-        <p>
-          Receivables, payables, and supplier settlements aligned in one view.
-        </p>
-      </div>
     </aside>
   );
 }
