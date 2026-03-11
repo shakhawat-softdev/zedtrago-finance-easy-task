@@ -11,9 +11,43 @@ import { PaymentsPage } from "./pages/payments/PaymentsPage";
 import { SuppliersPage } from "./pages/suppliers/SuppliersPage";
 import { toastError, toastSuccess } from "./utils/notify";
 
+const PAGE_META: Record<MenuKey, { title: string; subtitle: string }> = {
+  dashboard: {
+    title: "Operations Dashboard",
+    subtitle:
+      "Monitor bookings, billing, collections, and supplier activity in one place.",
+  },
+  customers: {
+    title: "Customer Portfolio",
+    subtitle:
+      "Manage agency profiles, commercial contacts, and preferred market settings.",
+  },
+  bookings: {
+    title: "Booking Operations",
+    subtitle:
+      "Track customer bookings, supplier allocation, and travel movement data.",
+  },
+  invoices: {
+    title: "Invoice Control",
+    subtitle:
+      "Issue, review, and monitor receivables tied to confirmed travel services.",
+  },
+  payments: {
+    title: "Payment Tracking",
+    subtitle:
+      "Review captured payments, gateways, and collection timing across invoices.",
+  },
+  suppliers: {
+    title: "Supplier Network",
+    subtitle:
+      "Maintain supplier relationships, settlement currencies, and integration modes.",
+  },
+};
+
 function App() {
   const { isAuthenticated, isLoading, login, logout, user } = useAuth();
   const [active, setActive] = useState<MenuKey>("dashboard");
+  const pageMeta = PAGE_META[active];
 
   if (!isAuthenticated) {
     return (
@@ -37,12 +71,15 @@ function App() {
     <div className="app-shell">
       <Sidebar active={active} onSelect={setActive} />
       <main className="app-main">
+        <div className="app-backdrop app-backdrop-one" />
+        <div className="app-backdrop app-backdrop-two" />
         <Navbar
-          title="Zedtrago Ops Console"
+          title={pageMeta.title}
+          subtitle={pageMeta.subtitle}
           userEmail={user?.email}
           onLogout={logout}
         />
-        <section>
+        <section className="page-content">
           {active === "dashboard" && <DashboardPage />}
           {active === "customers" && <CustomersPage />}
           {active === "bookings" && <BookingsPage />}
