@@ -1,0 +1,102 @@
+erDiagram
+    USERS ||--o{ BOOKINGS : manages
+    CUSTOMERS ||--o{ BOOKINGS : places
+    SUPPLIERS ||--o{ BOOKINGS : fulfills
+    BOOKINGS ||--o{ INVOICES : generates
+    INVOICES ||--o{ PAYMENTS : receives
+    BOOKINGS ||--o{ COMMISSIONS : accrues
+    ACCOUNTS ||--o{ LEDGER_ENTRY_LINES : posts_to
+    LEDGER_TRANSACTIONS ||--o{ LEDGER_ENTRY_LINES : contains
+    BOOKINGS ||--o{ LEDGER_TRANSACTIONS : triggers
+    PAYMENTS ||--o{ LEDGER_TRANSACTIONS : triggers
+    CURRENCY_RATES ||--o{ BOOKINGS : converts
+    CURRENCY_RATES ||--o{ INVOICES : values
+    CURRENCY_RATES ||--o{ PAYMENTS : revalues
+
+    USERS {
+      uuid id PK
+      string full_name
+      string email
+      string role
+      string region
+    }
+    CUSTOMERS {
+      uuid id PK
+      string company_name
+      string contact_name
+      string email
+      string market
+      string preferred_currency
+    }
+    SUPPLIERS {
+      uuid id PK
+      string supplier_name
+      string supplier_type
+      string settlement_currency
+      string integration_mode
+    }
+    BOOKINGS {
+      uuid id PK
+      uuid customer_id FK
+      uuid supplier_id FK
+      string booking_type
+      string status
+      string booking_currency
+      decimal gross_amount
+      decimal net_amount
+      timestamp travel_date
+    }
+    INVOICES {
+      uuid id PK
+      uuid booking_id FK
+      string invoice_number
+      string status
+      string currency
+      decimal total_amount
+      date due_date
+    }
+    PAYMENTS {
+      uuid id PK
+      uuid invoice_id FK
+      string provider
+      string status
+      string currency
+      decimal amount
+      timestamp received_at
+    }
+    COMMISSIONS {
+      uuid id PK
+      uuid booking_id FK
+      decimal amount
+      decimal rate
+      string status
+    }
+    ACCOUNTS {
+      uuid id PK
+      string code
+      string name
+      string type
+      string base_currency
+    }
+    LEDGER_TRANSACTIONS {
+      uuid id PK
+      string source_event
+      string reference_id
+      string currency
+      timestamp posted_at
+    }
+    LEDGER_ENTRY_LINES {
+      uuid id PK
+      uuid ledger_transaction_id FK
+      uuid account_id FK
+      decimal debit
+      decimal credit
+      string description
+    }
+    CURRENCY_RATES {
+      uuid id PK
+      string from_currency
+      string to_currency
+      decimal rate
+      date rate_date
+    }

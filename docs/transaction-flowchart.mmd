@@ -1,0 +1,19 @@
+flowchart TD
+    A[Customer booking created] --> B[Booking validation and supplier confirmation]
+    B --> C[Booking stored in operational database]
+    C --> D[Invoice generated for customer]
+    C --> E[Commission calculated based on supplier rules]
+    D --> F[AR journal entry created automatically]
+    E --> G[Commission accrual journal entry created]
+    D --> H[Payment request sent to Stripe or PayPal]
+    H --> I[Payment captured webhook received]
+    I --> J[Payment recorded and invoice updated]
+    J --> K[Cash receipt journal entry created]
+    C --> L[Supplier payable recognized]
+    L --> M[Supplier settlement batch processed]
+    M --> N[AP settlement journal entry created]
+    F --> O[Reporting projections refreshed]
+    G --> O
+    K --> O
+    N --> O
+    O --> P[SST and GST financial outputs available]

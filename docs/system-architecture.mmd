@@ -1,0 +1,28 @@
+flowchart LR
+    A[React Frontend\nOperations + Finance UI] --> B[NestJS API Gateway\nAuth + Validation + Swagger]
+    B --> C[Booking Module]
+    B --> D[Invoice Module]
+    B --> E[Payment Module]
+    B --> F[Commission Module]
+    B --> G[Ledger Module]
+    B --> H[Reporting Module]
+    B --> I[Currency Module]
+    C --> J[(PostgreSQL)]
+    D --> J
+    E --> J
+    F --> J
+    G --> J
+    H --> J
+    I --> J
+    E --> K[Stripe / PayPal]
+    C --> L[Booking Platforms]
+    C --> M[Hotel Suppliers]
+    C --> N[GDS Systems]
+    B --> O[Integration Orchestrator\nWebhook + Retry + Sync Jobs]
+    O --> K
+    O --> L
+    O --> M
+    O --> N
+    O --> P[External CRM]
+    J --> Q[Analytics + Tax Reporting Views]
+    H --> Q
