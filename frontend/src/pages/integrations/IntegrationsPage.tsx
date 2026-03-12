@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Table } from "../../components/table/Table";
+import { CommonDataTable } from "../../utils/CommonDataTable";
 import {
   useListIntegrationConnectorsQuery,
   useRunSyncJobMutation,
@@ -100,7 +100,7 @@ export function IntegrationsPage() {
       {isLoading ? (
         <div className="card">Loading connectors...</div>
       ) : (
-        <Table
+        <CommonDataTable
           data={data}
           columns={[
             { key: "name", header: "Connector" },
@@ -112,3 +112,4 @@ export function IntegrationsPage() {
     </div>
   );
 }
+

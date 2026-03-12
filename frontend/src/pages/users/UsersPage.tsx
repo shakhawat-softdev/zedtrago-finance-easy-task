@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Table } from "../../components/table/Table";
+import { CommonDataTable } from "../../utils/CommonDataTable";
 import { useGetUsersQuery, useUpdateUserMutation } from "../../services/api";
 import type { User } from "../../utils/types";
 import { toastError, toastSuccess } from "../../utils/notify";
@@ -106,7 +106,7 @@ export function UsersPage() {
       {isLoading ? (
         <div className="card">Loading users...</div>
       ) : (
-        <Table
+        <CommonDataTable
           data={data}
           columns={[
             { key: "id", header: "ID" },
@@ -134,3 +134,4 @@ export function UsersPage() {
     </div>
   );
 }
+

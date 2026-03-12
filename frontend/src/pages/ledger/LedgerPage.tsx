@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Table } from "../../components/table/Table";
+import { CommonDataTable } from "../../utils/CommonDataTable";
 import {
   useCreateLedgerTransactionMutation,
   useGetLedgerTransactionsQuery,
@@ -168,7 +168,7 @@ export function LedgerPage() {
       {loadingBalance ? (
         <div className="card">Loading trial balance...</div>
       ) : (
-        <Table
+        <CommonDataTable
           data={trialBalance?.accounts ?? []}
           columns={[
             { key: "code", header: "Account" },
@@ -184,7 +184,7 @@ export function LedgerPage() {
       {loadingTransactions ? (
         <div className="card">Loading ledger transactions...</div>
       ) : (
-        <Table
+        <CommonDataTable
           data={transactions}
           columns={[
             { key: "id", header: "ID" },
@@ -207,3 +207,4 @@ export function LedgerPage() {
     </div>
   );
 }
+

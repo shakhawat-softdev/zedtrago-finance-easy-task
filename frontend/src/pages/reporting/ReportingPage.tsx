@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Table } from "../../components/table/Table";
+import { CommonDataTable } from "../../utils/CommonDataTable";
 import {
   useGetReportingApAgingQuery,
   useGetReportingArAgingQuery,
@@ -177,7 +177,7 @@ export function ReportingPage() {
       {loadingCommissions ? (
         <div className="card">Loading supplier commission report...</div>
       ) : (
-        <Table
+        <CommonDataTable
           data={commissionsReport?.perSupplier ?? []}
           columns={[
             { key: "supplierId", header: "Supplier ID" },
@@ -193,7 +193,7 @@ export function ReportingPage() {
       {loadingLedger ? (
         <div className="card">Loading ledger summary...</div>
       ) : (
-        <Table
+        <CommonDataTable
           data={ledgerSummary?.accounts ?? []}
           columns={[
             { key: "code", header: "Code" },
@@ -212,3 +212,4 @@ export function ReportingPage() {
     </div>
   );
 }
+

@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Table } from "../../components/table/Table";
+import { CommonDataTable } from "../../utils/CommonDataTable";
 import {
   useCreateSupplierMutation,
   useDeleteSupplierMutation,
@@ -221,7 +221,7 @@ export function SuppliersPage() {
       {isLoading ? (
         <div className="card">Loading suppliers...</div>
       ) : (
-        <Table
+        <CommonDataTable
           data={data}
           columns={[
             { key: "id", header: "ID" },
@@ -257,3 +257,4 @@ export function SuppliersPage() {
     </div>
   );
 }
+

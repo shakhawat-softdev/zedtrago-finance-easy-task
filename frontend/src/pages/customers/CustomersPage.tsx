@@ -5,7 +5,7 @@ import {
   useGetCustomersQuery,
   useUpdateCustomerMutation,
 } from "../../services/api";
-import { Table } from "../../components/table/Table";
+import { CommonDataTable } from "../../utils/CommonDataTable";
 import type { Customer } from "../../utils/types";
 import {
   confirmDelete,
@@ -216,7 +216,7 @@ export function CustomersPage() {
       {isLoading ? (
         <div className="card">Loading customers...</div>
       ) : (
-        <Table
+        <CommonDataTable
           data={data}
           columns={[
             { key: "id", header: "ID" },
@@ -253,3 +253,4 @@ export function CustomersPage() {
     </div>
   );
 }
+

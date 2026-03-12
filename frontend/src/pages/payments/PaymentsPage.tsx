@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Table } from "../../components/table/Table";
+import { CommonDataTable } from "../../utils/CommonDataTable";
 import {
   useCreatePaymentMutation,
   useDeletePaymentMutation,
@@ -290,7 +290,7 @@ export function PaymentsPage() {
       {isLoading ? (
         <div className="card">Loading payments...</div>
       ) : (
-        <Table
+        <CommonDataTable
           data={data}
           columns={[
             { key: "id", header: "ID" },
@@ -332,3 +332,4 @@ export function PaymentsPage() {
     </div>
   );
 }
+

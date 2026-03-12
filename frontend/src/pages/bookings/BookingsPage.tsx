@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Table } from "../../components/table/Table";
+import { CommonDataTable } from "../../utils/CommonDataTable";
 import {
   useCreateBookingMutation,
   useDeleteBookingMutation,
@@ -373,7 +373,7 @@ export function BookingsPage() {
       {isLoading ? (
         <div className="card">Loading bookings...</div>
       ) : (
-        <Table
+        <CommonDataTable
           data={data}
           columns={[
             { key: "id", header: "ID" },
@@ -417,3 +417,4 @@ export function BookingsPage() {
     </div>
   );
 }
+

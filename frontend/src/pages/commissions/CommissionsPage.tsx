@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Table } from "../../components/table/Table";
+import { CommonDataTable } from "../../utils/CommonDataTable";
 import {
   useCreateCommissionMutation,
   useDeleteCommissionMutation,
@@ -242,7 +242,7 @@ export function CommissionsPage() {
       {isLoading ? (
         <div className="card">Loading commissions...</div>
       ) : (
-        <Table
+        <CommonDataTable
           data={data}
           columns={[
             { key: "id", header: "ID" },
@@ -278,3 +278,4 @@ export function CommissionsPage() {
     </div>
   );
 }
+

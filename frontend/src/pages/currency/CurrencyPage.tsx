@@ -1,5 +1,5 @@
 import { FormEvent, useMemo, useState } from "react";
-import { Table } from "../../components/table/Table";
+import { CommonDataTable } from "../../utils/CommonDataTable";
 import {
   useCreateCurrencyRateMutation,
   useDeleteCurrencyRateMutation,
@@ -220,7 +220,7 @@ export function CurrencyPage() {
       {isLoading ? (
         <div className="card">Loading currency rates...</div>
       ) : (
-        <Table
+        <CommonDataTable
           data={rows}
           columns={[
             { key: "fromCurrency", header: "From" },
@@ -255,3 +255,4 @@ export function CurrencyPage() {
     </div>
   );
 }
+
