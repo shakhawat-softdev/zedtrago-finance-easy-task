@@ -3,6 +3,7 @@ import { Table } from "../../components/table/Table";
 import {
   useCreateCommissionMutation,
   useDeleteCommissionMutation,
+  useGetBookingsQuery,
   useGetCommissionsQuery,
   useUpdateCommissionMutation,
 } from "../../services/api";
@@ -13,9 +14,11 @@ import {
   toastSuccess,
   toastWarning,
 } from "../../utils/notify";
+import { COMMISSION_STATUSES } from "../../utils/formOptions";
 
 export function CommissionsPage() {
   const { data = [], isLoading, refetch } = useGetCommissionsQuery();
+  const { data: bookings = [] } = useGetBookingsQuery();
   const [createCommission, { isLoading: creating }] =
     useCreateCommissionMutation();
   const [updateCommission, { isLoading: updating }] =
@@ -107,14 +110,38 @@ export function CommissionsPage() {
     <div className="section-stack">
       <form className="card form-grid" onSubmit={onSubmit}>
         <h2>Commissions</h2>
-        <input
-          placeholder="Booking ID"
+        {!bookings.length && (
+          <div
+            className="card empty-state"
+            style={{
+              gridColumn: "1 / -1",
+              padding: "1rem",
+              backgroundColor: "#fef3c7",
+              borderRadius: "0.5rem",
+              color: "#92400e",
+            }}
+          >
+            ⚠️ No bookings found. Please create a booking in the Bookings page
+            first.
+          </div>
+        )}
+        <select
           value={form.bookingId}
           onChange={(event) =>
             setForm({ ...form, bookingId: event.target.value })
           }
           required
-        />
+          disabled={!bookings.length}
+        >
+          <option value="" disabled>
+            Select booking
+          </option>
+          {bookings.map((booking) => (
+            <option key={booking.id} value={booking.id}>
+              {booking.id} • {booking.bookingType} • {booking.status}
+            </option>
+          ))}
+        </select>
         <input
           placeholder="Amount"
           type="number"
@@ -134,12 +161,17 @@ export function CommissionsPage() {
           }
           required
         />
-        <input
-          placeholder="Status"
+        <select
           value={form.status}
           onChange={(event) => setForm({ ...form, status: event.target.value })}
           required
-        />
+        >
+          {COMMISSION_STATUSES.map((status) => (
+            <option key={status} value={status}>
+              {status}
+            </option>
+          ))}
+        </select>
         <button className="btn" type="submit" disabled={creating}>
           {creating ? "Saving..." : "Add Commission"}
         </button>
@@ -148,14 +180,22 @@ export function CommissionsPage() {
       {editTarget ? (
         <form className="card form-grid" onSubmit={onSubmitEdit}>
           <h2>Edit Commission</h2>
-          <input
-            placeholder="Booking ID"
+          <select
             value={editForm.bookingId}
             onChange={(event) =>
               setEditForm({ ...editForm, bookingId: event.target.value })
             }
             required
-          />
+          >
+            <option value="" disabled>
+              Select booking
+            </option>
+            {bookings.map((booking) => (
+              <option key={booking.id} value={booking.id}>
+                {booking.id} • {booking.bookingType} • {booking.status}
+              </option>
+            ))}
+          </select>
           <input
             placeholder="Amount"
             type="number"
@@ -175,14 +215,19 @@ export function CommissionsPage() {
             }
             required
           />
-          <input
-            placeholder="Status"
+          <select
             value={editForm.status}
             onChange={(event) =>
               setEditForm({ ...editForm, status: event.target.value })
             }
             required
-          />
+          >
+            {COMMISSION_STATUSES.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
           <div className="actions-inline">
             <button className="btn" type="submit" disabled={updating}>
               {updating ? "Updating..." : "Save Changes"}
@@ -210,10 +255,18 @@ export function CommissionsPage() {
               header: "Actions",
               render: (row) => (
                 <div className="actions-inline">
-                  <button className="btn ghost" type="button" onClick={() => onStartEdit(row)}>
+                  <button
+                    className="btn ghost"
+                    type="button"
+                    onClick={() => onStartEdit(row)}
+                  >
                     Edit
                   </button>
-                  <button className="btn danger" type="button" onClick={() => onDelete(row.id)}>
+                  <button
+                    className="btn danger"
+                    type="button"
+                    onClick={() => onDelete(row.id)}
+                  >
                     Delete
                   </button>
                 </div>

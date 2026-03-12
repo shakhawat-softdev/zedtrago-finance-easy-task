@@ -1,23 +1,52 @@
+import { useState } from "react";
 import {
   useGetReportingArAgingQuery,
   useGetReportingCommissionsQuery,
   useGetReportingDashboardQuery,
   useGetReportingPlSummaryQuery,
 } from "../../services/api";
+import type { ReportFilter } from "../../utils/types";
 import { formatMoney } from "../../utils/format";
 
+const MARKETS = ["Malaysia", "Australia"] as const;
+
 export function DashboardPage() {
+  const [filters, setFilters] = useState<ReportFilter>({});
+
   const { data: dashboard, isLoading: loadingDashboard } =
-    useGetReportingDashboardQuery(undefined);
+    useGetReportingDashboardQuery(
+      filters.fromDate || filters.toDate || filters.market
+        ? filters
+        : undefined,
+    );
   const { data: arAging, isLoading: loadingArAging } =
-    useGetReportingArAgingQuery(undefined);
+    useGetReportingArAgingQuery(
+      filters.fromDate || filters.toDate || filters.market
+        ? filters
+        : undefined,
+    );
   const { data: commissions, isLoading: loadingCommissions } =
-    useGetReportingCommissionsQuery(undefined);
+    useGetReportingCommissionsQuery(
+      filters.fromDate || filters.toDate || filters.market
+        ? filters
+        : undefined,
+    );
   const { data: plSummary, isLoading: loadingPlSummary } =
-    useGetReportingPlSummaryQuery(undefined);
+    useGetReportingPlSummaryQuery(
+      filters.fromDate || filters.toDate || filters.market
+        ? filters
+        : undefined,
+    );
 
   const loading =
-    loadingDashboard || loadingArAging || loadingCommissions || loadingPlSummary;
+    loadingDashboard ||
+    loadingArAging ||
+    loadingCommissions ||
+    loadingPlSummary;
+
+  const handleClearFilters = () => {
+    setFilters({});
+  };
 
   const summary = dashboard?.summary;
   const coveragePct =
@@ -66,6 +95,65 @@ export function DashboardPage() {
 
   return (
     <div className="dashboard-stack">
+      <section className="card">
+        <div className="form-grid">
+          <div>
+            <label htmlFor="fromDate">From Date</label>
+            <input
+              id="fromDate"
+              type="date"
+              value={filters.fromDate || ""}
+              onChange={(e) =>
+                setFilters({
+                  ...filters,
+                  fromDate: e.target.value || undefined,
+                })
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="toDate">To Date</label>
+            <input
+              id="toDate"
+              type="date"
+              value={filters.toDate || ""}
+              onChange={(e) =>
+                setFilters({ ...filters, toDate: e.target.value || undefined })
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="market">Market</label>
+            <select
+              id="market"
+              value={filters.market || ""}
+              onChange={(e) =>
+                setFilters({ ...filters, market: e.target.value || undefined })
+              }
+            >
+              <option value="">All Markets</option>
+              {MARKETS.map((market) => (
+                <option key={market} value={market}>
+                  {market}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div
+            style={{ display: "flex", alignItems: "flex-end", gap: "0.5rem" }}
+          >
+            <button
+              type="button"
+              onClick={handleClearFilters}
+              className="btn-secondary"
+              style={{ flexGrow: 1 }}
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </section>
+
       <section className="hero-panel card">
         <div>
           <span className="eyebrow-label">Executive Summary</span>
@@ -83,8 +171,8 @@ export function DashboardPage() {
           </span>
           <strong>{summary?.bookings ?? 0} booking records tracked</strong>
           <p>
-            Collections are currently covering{" "}
-            {coveragePct}% of issued invoice value.
+            Collections are currently covering {coveragePct}% of issued invoice
+            value.
           </p>
         </div>
       </section>
@@ -113,7 +201,9 @@ export function DashboardPage() {
               <p>Captured payment value</p>
             </div>
             <div>
-              <strong>{formatMoney(summary?.outstandingReceivables ?? 0)}</strong>
+              <strong>
+                {formatMoney(summary?.outstandingReceivables ?? 0)}
+              </strong>
               <p>Open outstanding balance</p>
             </div>
           </div>
@@ -123,15 +213,19 @@ export function DashboardPage() {
           <span className="eyebrow-label">Performance</span>
           <h3>Reporting highlights</h3>
           <ul className="insight-list">
-            <li>{dashboard?.refreshMode ?? "Reporting services are syncing."}</li>
+            <li>
+              {dashboard?.refreshMode ?? "Reporting services are syncing."}
+            </li>
             <li>
               AR aging total stands at {formatMoney(arAging?.grandTotal ?? 0)}.
             </li>
             <li>
-              Commission report shows {commissions?.perSupplier.length ?? 0} supplier groups.
+              Commission report shows {commissions?.perSupplier.length ?? 0}{" "}
+              supplier groups.
             </li>
             <li>
-              Gross margin is {plSummary?.grossMarginPct ?? 0}% for {plSummary?.period ?? "current period"}.
+              Gross margin is {plSummary?.grossMarginPct ?? 0}% for{" "}
+              {plSummary?.period ?? "current period"}.
             </li>
           </ul>
         </article>

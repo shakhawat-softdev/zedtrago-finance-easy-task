@@ -7,6 +7,7 @@ import {
   useUpdateCurrencyRateMutation,
 } from "../../services/api";
 import type { CurrencyRate } from "../../utils/types";
+import { COMMON_CURRENCIES } from "../../utils/formOptions";
 import {
   confirmDelete,
   toastError,
@@ -109,30 +110,48 @@ export function CurrencyPage() {
     <div className="section-stack">
       <form className="card form-grid" onSubmit={onSubmit}>
         <h2>Currency Rates</h2>
-        <input
-          placeholder="From Currency"
+        <select
           value={form.fromCurrency}
-          onChange={(event) => setForm({ ...form, fromCurrency: event.target.value })}
+          onChange={(event) =>
+            setForm({ ...form, fromCurrency: event.target.value })
+          }
           required
-        />
-        <input
-          placeholder="To Currency"
+        >
+          {COMMON_CURRENCIES.map((currency) => (
+            <option key={currency} value={currency}>
+              {currency}
+            </option>
+          ))}
+        </select>
+        <select
           value={form.toCurrency}
-          onChange={(event) => setForm({ ...form, toCurrency: event.target.value })}
+          onChange={(event) =>
+            setForm({ ...form, toCurrency: event.target.value })
+          }
           required
-        />
+        >
+          {COMMON_CURRENCIES.map((currency) => (
+            <option key={currency} value={currency}>
+              {currency}
+            </option>
+          ))}
+        </select>
         <input
           placeholder="Rate"
           type="number"
           step="0.0001"
           value={form.rate}
-          onChange={(event) => setForm({ ...form, rate: Number(event.target.value) })}
+          onChange={(event) =>
+            setForm({ ...form, rate: Number(event.target.value) })
+          }
           required
         />
         <input
           placeholder="Rate Date"
           value={form.rateDate}
-          onChange={(event) => setForm({ ...form, rateDate: event.target.value })}
+          onChange={(event) =>
+            setForm({ ...form, rateDate: event.target.value })
+          }
           required
         />
         <button className="btn" type="submit" disabled={creating}>
@@ -143,22 +162,32 @@ export function CurrencyPage() {
       {editTarget ? (
         <form className="card form-grid" onSubmit={onSubmitEdit}>
           <h2>Edit Currency Rate</h2>
-          <input
-            placeholder="From Currency"
+          <select
             value={editForm.fromCurrency}
             onChange={(event) =>
               setEditForm({ ...editForm, fromCurrency: event.target.value })
             }
             required
-          />
-          <input
-            placeholder="To Currency"
+          >
+            {COMMON_CURRENCIES.map((currency) => (
+              <option key={currency} value={currency}>
+                {currency}
+              </option>
+            ))}
+          </select>
+          <select
             value={editForm.toCurrency}
             onChange={(event) =>
               setEditForm({ ...editForm, toCurrency: event.target.value })
             }
             required
-          />
+          >
+            {COMMON_CURRENCIES.map((currency) => (
+              <option key={currency} value={currency}>
+                {currency}
+              </option>
+            ))}
+          </select>
           <input
             placeholder="Rate"
             type="number"
@@ -203,10 +232,18 @@ export function CurrencyPage() {
               header: "Actions",
               render: (row) => (
                 <div className="actions-inline">
-                  <button className="btn ghost" type="button" onClick={() => onStartEdit(row)}>
+                  <button
+                    className="btn ghost"
+                    type="button"
+                    onClick={() => onStartEdit(row)}
+                  >
                     Edit
                   </button>
-                  <button className="btn danger" type="button" onClick={() => onDelete(row.id)}>
+                  <button
+                    className="btn danger"
+                    type="button"
+                    onClick={() => onDelete(row.id)}
+                  >
                     Delete
                   </button>
                 </div>

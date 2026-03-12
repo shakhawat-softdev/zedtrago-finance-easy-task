@@ -63,25 +63,33 @@ export function UsersPage() {
             placeholder="Email"
             type="email"
             value={editForm.email}
-            onChange={(event) => setEditForm({ ...editForm, email: event.target.value })}
+            onChange={(event) =>
+              setEditForm({ ...editForm, email: event.target.value })
+            }
             required
           />
           <input
             placeholder="Role"
             value={editForm.role}
-            onChange={(event) => setEditForm({ ...editForm, role: event.target.value })}
+            onChange={(event) =>
+              setEditForm({ ...editForm, role: event.target.value })
+            }
             required
           />
           <input
             placeholder="Status"
             value={editForm.status}
-            onChange={(event) => setEditForm({ ...editForm, status: event.target.value })}
+            onChange={(event) =>
+              setEditForm({ ...editForm, status: event.target.value })
+            }
             required
           />
           <input
             placeholder="Region"
             value={editForm.region}
-            onChange={(event) => setEditForm({ ...editForm, region: event.target.value })}
+            onChange={(event) =>
+              setEditForm({ ...editForm, region: event.target.value })
+            }
             required
           />
           <div className="actions-inline">
@@ -111,7 +119,11 @@ export function UsersPage() {
               key: "actions",
               header: "Actions",
               render: (row) => (
-                <button className="btn ghost" type="button" onClick={() => onStartEdit(row)}>
+                <button
+                  className="btn ghost"
+                  type="button"
+                  onClick={() => onStartEdit(row)}
+                >
                   Edit
                 </button>
               ),

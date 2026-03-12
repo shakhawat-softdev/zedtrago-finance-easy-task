@@ -5,6 +5,11 @@ import {
   useRunSyncJobMutation,
 } from "../../services/api";
 import type { SyncJobPayload } from "../../utils/types";
+import {
+  SYNC_JOB_MODES,
+  SYNC_JOB_RESOURCES,
+  SYNC_JOB_SOURCES,
+} from "../../utils/formOptions";
 import { toastError, toastSuccess } from "../../utils/notify";
 
 export function IntegrationsPage() {
@@ -36,14 +41,18 @@ export function IntegrationsPage() {
     <div className="section-stack">
       <form className="card form-grid" onSubmit={onSubmit}>
         <h2>Queue Sync Job</h2>
-        <input
-          placeholder="Source"
+        <select
           value={form.source}
           onChange={(event) => setForm({ ...form, source: event.target.value })}
           required
-        />
-        <input
-          placeholder="Mode"
+        >
+          {SYNC_JOB_SOURCES.map((source) => (
+            <option key={source} value={source}>
+              {source}
+            </option>
+          ))}
+        </select>
+        <select
           value={form.mode}
           onChange={(event) =>
             setForm({
@@ -52,13 +61,26 @@ export function IntegrationsPage() {
             })
           }
           required
-        />
-        <input
-          placeholder="Resource"
+        >
+          {SYNC_JOB_MODES.map((mode) => (
+            <option key={mode} value={mode}>
+              {mode}
+            </option>
+          ))}
+        </select>
+        <select
           value={form.resource}
-          onChange={(event) => setForm({ ...form, resource: event.target.value })}
+          onChange={(event) =>
+            setForm({ ...form, resource: event.target.value })
+          }
           required
-        />
+        >
+          {SYNC_JOB_RESOURCES.map((resource) => (
+            <option key={resource} value={resource}>
+              {resource}
+            </option>
+          ))}
+        </select>
         <button className="btn" type="submit" disabled={running}>
           {running ? "Queueing..." : "Run Sync"}
         </button>

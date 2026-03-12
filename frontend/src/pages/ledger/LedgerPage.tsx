@@ -9,8 +9,11 @@ import { formatDate, formatMoney } from "../../utils/format";
 import { toastError, toastSuccess } from "../../utils/notify";
 
 export function LedgerPage() {
-  const { data: transactions = [], isLoading: loadingTransactions, refetch } =
-    useGetLedgerTransactionsQuery();
+  const {
+    data: transactions = [],
+    isLoading: loadingTransactions,
+    refetch,
+  } = useGetLedgerTransactionsQuery();
   const { data: trialBalance, isLoading: loadingBalance } =
     useGetTrialBalanceQuery();
   const [createLedgerTransaction, { isLoading: creating }] =
@@ -79,7 +82,9 @@ export function LedgerPage() {
         <input
           placeholder="Currency"
           value={form.currency}
-          onChange={(event) => setForm({ ...form, currency: event.target.value })}
+          onChange={(event) =>
+            setForm({ ...form, currency: event.target.value })
+          }
           required
         />
         <input

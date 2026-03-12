@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Table } from "../../components/table/Table";
 import {
   useGetReportingApAgingQuery,
@@ -7,24 +8,107 @@ import {
   useGetReportingPlSummaryQuery,
   useGetReportingTaxQuery,
 } from "../../services/api";
+import type { ReportFilter } from "../../utils/types";
 import { formatMoney } from "../../utils/format";
 
+const MARKETS = ["Malaysia", "Australia"] as const;
+
 export function ReportingPage() {
-  const { data: arAging, isLoading: loadingAr } =
-    useGetReportingArAgingQuery(undefined);
-  const { data: apAging, isLoading: loadingAp } =
-    useGetReportingApAgingQuery(undefined);
-  const { data: taxReport, isLoading: loadingTax } =
-    useGetReportingTaxQuery(undefined);
+  const [filters, setFilters] = useState<ReportFilter>({});
+
+  const { data: arAging, isLoading: loadingAr } = useGetReportingArAgingQuery(
+    filters.fromDate || filters.toDate || filters.market ? filters : undefined,
+  );
+  const { data: apAging, isLoading: loadingAp } = useGetReportingApAgingQuery(
+    filters.fromDate || filters.toDate || filters.market ? filters : undefined,
+  );
+  const { data: taxReport, isLoading: loadingTax } = useGetReportingTaxQuery(
+    filters.fromDate || filters.toDate || filters.market ? filters : undefined,
+  );
   const { data: ledgerSummary, isLoading: loadingLedger } =
-    useGetReportingLedgerSummaryQuery(undefined);
+    useGetReportingLedgerSummaryQuery(
+      filters.fromDate || filters.toDate || filters.market
+        ? filters
+        : undefined,
+    );
   const { data: commissionsReport, isLoading: loadingCommissions } =
-    useGetReportingCommissionsQuery(undefined);
+    useGetReportingCommissionsQuery(
+      filters.fromDate || filters.toDate || filters.market
+        ? filters
+        : undefined,
+    );
   const { data: plSummary, isLoading: loadingPl } =
-    useGetReportingPlSummaryQuery(undefined);
+    useGetReportingPlSummaryQuery(
+      filters.fromDate || filters.toDate || filters.market
+        ? filters
+        : undefined,
+    );
+
+  const handleClearFilters = () => {
+    setFilters({});
+  };
 
   return (
     <div className="section-stack">
+      <section className="card">
+        <div className="form-grid">
+          <div>
+            <label htmlFor="fromDate">From Date</label>
+            <input
+              id="fromDate"
+              type="date"
+              value={filters.fromDate || ""}
+              onChange={(e) =>
+                setFilters({
+                  ...filters,
+                  fromDate: e.target.value || undefined,
+                })
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="toDate">To Date</label>
+            <input
+              id="toDate"
+              type="date"
+              value={filters.toDate || ""}
+              onChange={(e) =>
+                setFilters({ ...filters, toDate: e.target.value || undefined })
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="market">Market</label>
+            <select
+              id="market"
+              value={filters.market || ""}
+              onChange={(e) =>
+                setFilters({ ...filters, market: e.target.value || undefined })
+              }
+            >
+              <option value="">All Markets</option>
+              {MARKETS.map((market) => (
+                <option key={market} value={market}>
+                  {market}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div
+            style={{ display: "flex", alignItems: "flex-end", gap: "0.5rem" }}
+          >
+            <button
+              type="button"
+              onClick={handleClearFilters}
+              className="btn-secondary"
+              style={{ flexGrow: 1 }}
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </section>
+
       <section className="page-grid">
         <article className="card kpi tone-indigo">
           <span className="kpi-label">AR Aging</span>
@@ -76,9 +160,12 @@ export function ReportingPage() {
           <span className="eyebrow-label">Commissions</span>
           <h3>Settlement position</h3>
           <ul className="insight-list">
-            <li>Grand total: {formatMoney(commissionsReport?.grandTotal ?? 0)}</li>
             <li>
-              Pending settlement: {formatMoney(commissionsReport?.pendingSettlement ?? 0)}
+              Grand total: {formatMoney(commissionsReport?.grandTotal ?? 0)}
+            </li>
+            <li>
+              Pending settlement:{" "}
+              {formatMoney(commissionsReport?.pendingSettlement ?? 0)}
             </li>
             <li>
               Supplier groups: {commissionsReport?.perSupplier.length ?? 0}
@@ -119,7 +206,7 @@ export function ReportingPage() {
         />
       )}
 
-      {(loadingAr || loadingAp || loadingPl) ? (
+      {loadingAr || loadingAp || loadingPl ? (
         <div className="card">Loading aging and profitability reports...</div>
       ) : null}
     </div>
