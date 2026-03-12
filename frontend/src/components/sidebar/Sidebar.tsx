@@ -1,10 +1,16 @@
 export type MenuKey =
   | "dashboard"
+  | "reporting"
+  | "ledger"
+  | "integrations"
   | "customers"
   | "bookings"
   | "invoices"
   | "payments"
-  | "suppliers";
+  | "suppliers"
+  | "commissions"
+  | "currency"
+  | "users";
 
 type SidebarProps = {
   active: MenuKey;
@@ -13,11 +19,17 @@ type SidebarProps = {
 
 const MENU: Array<{ key: MenuKey; label: string; icon: string }> = [
   { key: "dashboard", label: "Dashboard", icon: "01" },
-  { key: "customers", label: "Customers", icon: "02" },
-  { key: "bookings", label: "Bookings", icon: "03" },
-  { key: "invoices", label: "Invoices", icon: "04" },
-  { key: "payments", label: "Payments", icon: "05" },
-  { key: "suppliers", label: "Suppliers", icon: "06" },
+  { key: "reporting", label: "Reporting", icon: "02" },
+  { key: "ledger", label: "Ledger", icon: "03" },
+  { key: "integrations", label: "Integrations", icon: "04" },
+  { key: "customers", label: "Customers", icon: "05" },
+  { key: "bookings", label: "Bookings", icon: "06" },
+  { key: "invoices", label: "Invoices", icon: "07" },
+  { key: "payments", label: "Payments", icon: "08" },
+  { key: "suppliers", label: "Suppliers", icon: "09" },
+  { key: "commissions", label: "Commissions", icon: "10" },
+  { key: "currency", label: "Currency", icon: "11" },
+  { key: "users", label: "Users", icon: "12" },
 ];
 
 export function Sidebar({ active, onSelect }: SidebarProps) {

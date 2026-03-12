@@ -1,31 +1,67 @@
 import {
-  useGetBookingsQuery,
-  useGetCustomersQuery,
-  useGetInvoicesQuery,
-  useGetPaymentsQuery,
-  useGetSuppliersQuery,
+  useGetReportingArAgingQuery,
+  useGetReportingCommissionsQuery,
+  useGetReportingDashboardQuery,
+  useGetReportingPlSummaryQuery,
 } from "../../services/api";
+import { formatMoney } from "../../utils/format";
 
 export function DashboardPage() {
-  const { data: customers = [] } = useGetCustomersQuery();
-  const { data: bookings = [] } = useGetBookingsQuery();
-  const { data: invoices = [] } = useGetInvoicesQuery();
-  const { data: payments = [] } = useGetPaymentsQuery();
-  const { data: suppliers = [] } = useGetSuppliersQuery();
+  const { data: dashboard, isLoading: loadingDashboard } =
+    useGetReportingDashboardQuery(undefined);
+  const { data: arAging, isLoading: loadingArAging } =
+    useGetReportingArAgingQuery(undefined);
+  const { data: commissions, isLoading: loadingCommissions } =
+    useGetReportingCommissionsQuery(undefined);
+  const { data: plSummary, isLoading: loadingPlSummary } =
+    useGetReportingPlSummaryQuery(undefined);
 
-  const invoiced = invoices.reduce((sum, i) => sum + i.totalAmount, 0);
-  const collected = payments.reduce((sum, p) => sum + p.amount, 0);
-  const outstanding = invoiced - collected;
+  const loading =
+    loadingDashboard || loadingArAging || loadingCommissions || loadingPlSummary;
+
+  const summary = dashboard?.summary;
+  const coveragePct =
+    summary && summary.invoicedAmount > 0
+      ? ((summary.collectedAmount / summary.invoicedAmount) * 100).toFixed(0)
+      : "0";
 
   const metrics = [
-    { label: "Customers", value: customers.length, tone: "teal" },
-    { label: "Bookings", value: bookings.length, tone: "amber" },
-    { label: "Invoices", value: invoices.length, tone: "blue" },
-    { label: "Payments", value: payments.length, tone: "green" },
-    { label: "Suppliers", value: suppliers.length, tone: "slate" },
-    { label: "Total Invoiced", value: invoiced.toFixed(2), tone: "indigo" },
-    { label: "Total Collected", value: collected.toFixed(2), tone: "emerald" },
-    { label: "Outstanding", value: outstanding.toFixed(2), tone: "rose" },
+    { label: "Bookings", value: summary?.bookings ?? 0, tone: "amber" },
+    {
+      label: "Total Invoiced",
+      value: formatMoney(summary?.invoicedAmount ?? 0),
+      tone: "indigo",
+    },
+    {
+      label: "Total Collected",
+      value: formatMoney(summary?.collectedAmount ?? 0),
+      tone: "emerald",
+    },
+    {
+      label: "Outstanding",
+      value: formatMoney(summary?.outstandingReceivables ?? 0),
+      tone: "rose",
+    },
+    {
+      label: "Accrued Commission",
+      value: formatMoney(summary?.accruedCommission ?? 0),
+      tone: "teal",
+    },
+    {
+      label: "Gross Profit",
+      value: formatMoney(plSummary?.grossProfit ?? 0),
+      tone: "blue",
+    },
+    {
+      label: "Net Profit",
+      value: formatMoney(plSummary?.netProfit ?? 0),
+      tone: "green",
+    },
+    {
+      label: "Pending Commission",
+      value: formatMoney(commissions?.pendingSettlement ?? 0),
+      tone: "slate",
+    },
   ];
 
   return (
@@ -42,12 +78,13 @@ export function DashboardPage() {
           </p>
         </div>
         <div className="hero-aside">
-          <span className="status-pill">Live API sync</span>
-          <strong>{bookings.length} active booking records tracked</strong>
+          <span className="status-pill">
+            {loading ? "Refreshing analytics" : "Live reporting feed"}
+          </span>
+          <strong>{summary?.bookings ?? 0} booking records tracked</strong>
           <p>
             Collections are currently covering{" "}
-            {invoiced === 0 ? "0" : ((collected / invoiced) * 100).toFixed(0)}%
-            of issued invoice value.
+            {coveragePct}% of issued invoice value.
           </p>
         </div>
       </section>
@@ -68,32 +105,33 @@ export function DashboardPage() {
           <h3>Revenue and cash movement</h3>
           <div className="insight-row">
             <div>
-              <strong>{invoiced.toFixed(2)}</strong>
+              <strong>{formatMoney(summary?.invoicedAmount ?? 0)}</strong>
               <p>Issued invoice value</p>
             </div>
             <div>
-              <strong>{collected.toFixed(2)}</strong>
+              <strong>{formatMoney(summary?.collectedAmount ?? 0)}</strong>
               <p>Captured payment value</p>
             </div>
             <div>
-              <strong>{outstanding.toFixed(2)}</strong>
+              <strong>{formatMoney(summary?.outstandingReceivables ?? 0)}</strong>
               <p>Open outstanding balance</p>
             </div>
           </div>
         </article>
 
         <article className="card insight-card">
-          <span className="eyebrow-label">Coverage</span>
-          <h3>Operational footprint</h3>
+          <span className="eyebrow-label">Performance</span>
+          <h3>Reporting highlights</h3>
           <ul className="insight-list">
-            <li>{customers.length} customer profiles in active workspace</li>
+            <li>{dashboard?.refreshMode ?? "Reporting services are syncing."}</li>
             <li>
-              {suppliers.length} supplier records ready for settlement
-              processing
+              AR aging total stands at {formatMoney(arAging?.grandTotal ?? 0)}.
             </li>
             <li>
-              {payments.length} payment transactions available for
-              reconciliation
+              Commission report shows {commissions?.perSupplier.length ?? 0} supplier groups.
+            </li>
+            <li>
+              Gross margin is {plSummary?.grossMarginPct ?? 0}% for {plSummary?.period ?? "current period"}.
             </li>
           </ul>
         </article>

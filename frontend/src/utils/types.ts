@@ -66,3 +66,157 @@ export type Supplier = {
   settlementCurrency: string;
   integrationMode: string;
 };
+
+export type User = {
+  id: string;
+  fullName: string;
+  email: string;
+  role: string;
+  status: string;
+  region: string;
+};
+
+export type Commission = {
+  id: string;
+  bookingId: string;
+  amount: number;
+  rate: number;
+  status: string;
+};
+
+export type CurrencyRate = {
+  fromCurrency: string;
+  toCurrency: string;
+  rate: number;
+  rateDate: string;
+};
+
+export type IntegrationConnector = {
+  name: string;
+  auth: string;
+  retryPolicy: string;
+};
+
+export type SyncJobPayload = {
+  source: string;
+  mode: "pull" | "push" | "webhook";
+  resource: string;
+};
+
+export type SyncJobResponse = SyncJobPayload & {
+  status: string;
+  correlationId: string;
+  strategy: string;
+};
+
+export type LedgerEntryLine = {
+  accountCode: string;
+  debit: number;
+  credit: number;
+  description: string;
+};
+
+export type LedgerTransaction = {
+  id: string;
+  sourceEvent: string;
+  referenceId: string;
+  currency: string;
+  entries: LedgerEntryLine[];
+  postedAt: string;
+};
+
+export type CreateLedgerTransactionPayload = Omit<
+  LedgerTransaction,
+  "id" | "postedAt"
+>;
+
+export type TrialBalanceAccount = {
+  code: string;
+  name: string;
+  debit: number;
+  credit: number;
+  balance: number;
+};
+
+export type TrialBalance = {
+  accounts: TrialBalanceAccount[];
+  totalDebit: number;
+  totalCredit: number;
+  balanced: boolean;
+};
+
+export type ReportFilter = {
+  fromDate?: string;
+  toDate?: string;
+  market?: string;
+};
+
+export type AgingBucket = {
+  count: number;
+  total: number;
+  invoices?: string[];
+};
+
+export type DashboardReport = {
+  summary: {
+    bookings: number;
+    invoicedAmount: number;
+    collectedAmount: number;
+    outstandingReceivables: number;
+    accruedCommission: number;
+  };
+  compliance: {
+    malaysia: string;
+    australia: string;
+  };
+  refreshMode: string;
+};
+
+export type AgingReport = {
+  asOf: string;
+  buckets: Record<string, AgingBucket>;
+  grandTotal: number;
+};
+
+export type TaxJurisdictionReport = {
+  taxCode: string;
+  rate: number;
+  taxableAmount: number;
+  taxDue: number;
+};
+
+export type TaxReport = {
+  period: string;
+  malaysia: TaxJurisdictionReport;
+  australia: TaxJurisdictionReport;
+  totalTaxDue: number;
+};
+
+export type CommissionsBySupplier = {
+  supplierId: string;
+  supplierName: string;
+  totalCommission: number;
+  settled: number;
+  pending: number;
+};
+
+export type CommissionsReport = {
+  period: string;
+  perSupplier: CommissionsBySupplier[];
+  grandTotal: number;
+  pendingSettlement: number;
+};
+
+export type ProfitLossSummary = {
+  period: string;
+  revenue: number;
+  costOfSales: number;
+  grossProfit: number;
+  grossMarginPct: number;
+  commissionIncome: number;
+  netProfit: number;
+};
+
+export type DeleteResponse = {
+  deleted: boolean;
+};

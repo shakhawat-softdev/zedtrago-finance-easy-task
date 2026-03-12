@@ -12,7 +12,7 @@ type TableProps<T> = {
   emptyText?: string;
 };
 
-export function Table<T extends { id?: string }>({
+export function Table<T extends object>({
   columns,
   data,
   emptyText = "No records",
@@ -33,7 +33,13 @@ export function Table<T extends { id?: string }>({
         </thead>
         <tbody>
           {data.map((row, index) => (
-            <tr key={row.id ?? index}>
+            <tr
+              key={
+                typeof (row as { id?: unknown }).id === "string"
+                  ? ((row as { id?: string }).id ?? index)
+                  : index
+              }
+            >
               {columns.map((col) => (
                 <td key={String(col.key)}>
                   {col.render
