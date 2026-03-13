@@ -54,16 +54,21 @@ select {
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .app-shell {
   min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
   grid-template-columns: 286px 1fr;
+  align-items: stretch;
 }
 
 .app-main {
   position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
   padding: 28px;
   overflow-x: hidden;
   overflow-y: auto;
@@ -181,6 +186,7 @@ select {
 
 .sidebar {
   position: relative;
+  align-self: stretch;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -190,16 +196,38 @@ select {
     linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.03);
-  max-height: 100vh;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  min-height: 100%;
+  height: auto;
+  overflow-y: visible;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 242, 207, 0.5) rgba(255, 255, 255, 0.08);
 }
 
 .sidebar::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-  display: none;
+  width: 10px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(125, 242, 207, 0.82),
+    rgba(121, 212, 220, 0.7)
+  );
+  border-radius: 999px;
+  border: 2px solid rgba(6, 26, 32, 0.45);
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(147, 250, 219, 0.95),
+    rgba(138, 224, 232, 0.85)
+  );
 }
 
 .sidebar-brand {
@@ -1084,6 +1112,10 @@ tbody tr:hover {
     grid-template-columns: 1fr;
   }
 
+  .app-main {
+    min-height: auto;
+  }
+
   .topbar,
   .hero-panel,
   .insight-grid,
@@ -1100,6 +1132,8 @@ tbody tr:hover {
   }
 
   .sidebar {
+    min-height: auto;
+    height: auto;
     border-right: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
