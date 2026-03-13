@@ -7,6 +7,7 @@ import {
 } from "../../services/api";
 import { formatDate, formatMoney } from "../../utils/format";
 import { toastError, toastSuccess } from "../../utils/notify";
+import { FormModal } from "../../components/modal/FormModal";
 
 export function LedgerPage() {
   const {
@@ -18,6 +19,7 @@ export function LedgerPage() {
     useGetTrialBalanceQuery();
   const [createLedgerTransaction, { isLoading: creating }] =
     useCreateLedgerTransactionMutation();
+  const [openCreateModal, setOpenCreateModal] = useState(false);
   const [form, setForm] = useState({
     sourceEvent: "manual_adjustment",
     referenceId: "adj-1001",
@@ -52,6 +54,7 @@ export function LedgerPage() {
           },
         ],
       }).unwrap();
+      setOpenCreateModal(false);
       toastSuccess("Ledger transaction posted successfully");
       refetch();
     } catch {
@@ -61,86 +64,102 @@ export function LedgerPage() {
 
   return (
     <div className="section-stack">
-      <form className="card form-grid" onSubmit={onSubmit}>
-        <h2>Post Ledger Transaction</h2>
-        <input
-          placeholder="Source Event"
-          value={form.sourceEvent}
-          onChange={(event) =>
-            setForm({ ...form, sourceEvent: event.target.value })
-          }
-          required
-        />
-        <input
-          placeholder="Reference ID"
-          value={form.referenceId}
-          onChange={(event) =>
-            setForm({ ...form, referenceId: event.target.value })
-          }
-          required
-        />
-        <input
-          placeholder="Currency"
-          value={form.currency}
-          onChange={(event) =>
-            setForm({ ...form, currency: event.target.value })
-          }
-          required
-        />
-        <input
-          placeholder="Debit Account"
-          value={form.debitAccountCode}
-          onChange={(event) =>
-            setForm({ ...form, debitAccountCode: event.target.value })
-          }
-          required
-        />
-        <input
-          placeholder="Debit Amount"
-          type="number"
-          value={form.debitAmount}
-          onChange={(event) =>
-            setForm({ ...form, debitAmount: Number(event.target.value) })
-          }
-          required
-        />
-        <input
-          placeholder="Debit Description"
-          value={form.debitDescription}
-          onChange={(event) =>
-            setForm({ ...form, debitDescription: event.target.value })
-          }
-          required
-        />
-        <input
-          placeholder="Credit Account"
-          value={form.creditAccountCode}
-          onChange={(event) =>
-            setForm({ ...form, creditAccountCode: event.target.value })
-          }
-          required
-        />
-        <input
-          placeholder="Credit Amount"
-          type="number"
-          value={form.creditAmount}
-          onChange={(event) =>
-            setForm({ ...form, creditAmount: Number(event.target.value) })
-          }
-          required
-        />
-        <input
-          placeholder="Credit Description"
-          value={form.creditDescription}
-          onChange={(event) =>
-            setForm({ ...form, creditDescription: event.target.value })
-          }
-          required
-        />
-        <button className="btn" type="submit" disabled={creating}>
-          {creating ? "Posting..." : "Post Transaction"}
+      <div className="card module-header">
+        <h2>Ledger Operations</h2>
+        <button
+          className="btn"
+          type="button"
+          onClick={() => setOpenCreateModal(true)}
+        >
+          Post Transaction
         </button>
-      </form>
+      </div>
+
+      <FormModal
+        isOpen={openCreateModal}
+        title="Post Ledger Transaction"
+        onClose={() => setOpenCreateModal(false)}
+      >
+        <form className="form-grid" onSubmit={onSubmit}>
+          <input
+            placeholder="Source Event"
+            value={form.sourceEvent}
+            onChange={(event) =>
+              setForm({ ...form, sourceEvent: event.target.value })
+            }
+            required
+          />
+          <input
+            placeholder="Reference ID"
+            value={form.referenceId}
+            onChange={(event) =>
+              setForm({ ...form, referenceId: event.target.value })
+            }
+            required
+          />
+          <input
+            placeholder="Currency"
+            value={form.currency}
+            onChange={(event) =>
+              setForm({ ...form, currency: event.target.value })
+            }
+            required
+          />
+          <input
+            placeholder="Debit Account"
+            value={form.debitAccountCode}
+            onChange={(event) =>
+              setForm({ ...form, debitAccountCode: event.target.value })
+            }
+            required
+          />
+          <input
+            placeholder="Debit Amount"
+            type="number"
+            value={form.debitAmount}
+            onChange={(event) =>
+              setForm({ ...form, debitAmount: Number(event.target.value) })
+            }
+            required
+          />
+          <input
+            placeholder="Debit Description"
+            value={form.debitDescription}
+            onChange={(event) =>
+              setForm({ ...form, debitDescription: event.target.value })
+            }
+            required
+          />
+          <input
+            placeholder="Credit Account"
+            value={form.creditAccountCode}
+            onChange={(event) =>
+              setForm({ ...form, creditAccountCode: event.target.value })
+            }
+            required
+          />
+          <input
+            placeholder="Credit Amount"
+            type="number"
+            value={form.creditAmount}
+            onChange={(event) =>
+              setForm({ ...form, creditAmount: Number(event.target.value) })
+            }
+            required
+          />
+          <input
+            placeholder="Credit Description"
+            value={form.creditDescription}
+            onChange={(event) =>
+              setForm({ ...form, creditDescription: event.target.value })
+            }
+            required
+          />
+          <button className="btn" type="submit" disabled={creating}>
+            {creating ? "Posting..." : "Post Transaction"}
+          </button>
+        </form>
+      </FormModal>
 
       <section className="page-grid">
         <article className="card kpi tone-blue">
@@ -207,4 +226,3 @@ export function LedgerPage() {
     </div>
   );
 }
-

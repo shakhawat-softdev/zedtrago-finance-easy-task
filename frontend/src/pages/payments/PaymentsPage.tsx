@@ -20,6 +20,7 @@ import {
   PAYMENT_PROVIDERS,
   PAYMENT_STATUSES,
 } from "../../utils/formOptions";
+import { FormModal } from "../../components/modal/FormModal";
 
 export function PaymentsPage() {
   const { data = [], isLoading, refetch } = useGetPaymentsQuery();
@@ -27,6 +28,7 @@ export function PaymentsPage() {
   const [createPayment, { isLoading: creating }] = useCreatePaymentMutation();
   const [updatePayment, { isLoading: updating }] = useUpdatePaymentMutation();
   const [deletePayment] = useDeletePaymentMutation();
+  const [openCreateModal, setOpenCreateModal] = useState(false);
   const [form, setForm] = useState({
     invoiceId: "inv-1001",
     provider: "stripe",
@@ -49,6 +51,7 @@ export function PaymentsPage() {
     event.preventDefault();
     try {
       await createPayment({ ...form, amount: Number(form.amount) }).unwrap();
+      setOpenCreateModal(false);
       toastSuccess("Payment created successfully");
       refetch();
     } catch {
@@ -118,98 +121,43 @@ export function PaymentsPage() {
 
   return (
     <div className="section-stack">
-      <form className="card form-grid" onSubmit={onSubmit}>
+      <div className="card module-header">
         <h2>Payments</h2>
-        {!invoices.length && (
-          <div
-            className="card empty-state"
-            style={{
-              gridColumn: "1 / -1",
-              padding: "1rem",
-              backgroundColor: "#fef3c7",
-              borderRadius: "0.5rem",
-              color: "#92400e",
-            }}
-          >
-            ⚠️ No invoices found. Please create an invoice in the Invoices page
-            first.
-          </div>
-        )}
-        <select
-          value={form.invoiceId}
-          onChange={(e) => setForm({ ...form, invoiceId: e.target.value })}
-          required
-          disabled={!invoices.length}
+        <button
+          className="btn"
+          type="button"
+          onClick={() => setOpenCreateModal(true)}
         >
-          <option value="" disabled>
-            Select invoice
-          </option>
-          {invoices.map((invoice) => (
-            <option key={invoice.id} value={invoice.id}>
-              {invoice.invoiceNumber ?? invoice.id} • {invoice.status}
-            </option>
-          ))}
-        </select>
-        <select
-          value={form.provider}
-          onChange={(e) => setForm({ ...form, provider: e.target.value })}
-          required
-        >
-          {PAYMENT_PROVIDERS.map((provider) => (
-            <option key={provider} value={provider}>
-              {provider}
-            </option>
-          ))}
-        </select>
-        <select
-          value={form.status}
-          onChange={(e) => setForm({ ...form, status: e.target.value })}
-          required
-        >
-          {PAYMENT_STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
-        <select
-          value={form.currency}
-          onChange={(e) => setForm({ ...form, currency: e.target.value })}
-          required
-        >
-          {COMMON_CURRENCIES.map((currency) => (
-            <option key={currency} value={currency}>
-              {currency}
-            </option>
-          ))}
-        </select>
-        <input
-          placeholder="Amount"
-          type="number"
-          value={form.amount}
-          onChange={(e) => setForm({ ...form, amount: Number(e.target.value) })}
-          required
-        />
-        <input
-          placeholder="Received At ISO"
-          value={form.receivedAt}
-          onChange={(e) => setForm({ ...form, receivedAt: e.target.value })}
-          required
-        />
-        <button className="btn" type="submit" disabled={creating}>
-          {creating ? "Saving..." : "Add Payment"}
+          Add Payment
         </button>
-      </form>
+      </div>
 
-      {editTarget ? (
-        <form className="card form-grid" onSubmit={onSubmitEdit}>
-          <h2>Edit Payment</h2>
+      <FormModal
+        isOpen={openCreateModal}
+        title="Add Payment"
+        onClose={() => setOpenCreateModal(false)}
+      >
+        <form className="form-grid" onSubmit={onSubmit}>
+          {!invoices.length && (
+            <div
+              className="card empty-state"
+              style={{
+                gridColumn: "1 / -1",
+                padding: "1rem",
+                backgroundColor: "#fef3c7",
+                borderRadius: "0.5rem",
+                color: "#92400e",
+              }}
+            >
+              ⚠️ No invoices found. Please create an invoice in the Invoices
+              page first.
+            </div>
+          )}
           <select
-            value={editForm.invoiceId}
-            onChange={(e) =>
-              setEditForm({ ...editForm, invoiceId: e.target.value })
-            }
+            value={form.invoiceId}
+            onChange={(e) => setForm({ ...form, invoiceId: e.target.value })}
             required
+            disabled={!invoices.length}
           >
             <option value="" disabled>
               Select invoice
@@ -221,10 +169,8 @@ export function PaymentsPage() {
             ))}
           </select>
           <select
-            value={editForm.provider}
-            onChange={(e) =>
-              setEditForm({ ...editForm, provider: e.target.value })
-            }
+            value={form.provider}
+            onChange={(e) => setForm({ ...form, provider: e.target.value })}
             required
           >
             {PAYMENT_PROVIDERS.map((provider) => (
@@ -234,10 +180,8 @@ export function PaymentsPage() {
             ))}
           </select>
           <select
-            value={editForm.status}
-            onChange={(e) =>
-              setEditForm({ ...editForm, status: e.target.value })
-            }
+            value={form.status}
+            onChange={(e) => setForm({ ...form, status: e.target.value })}
             required
           >
             {PAYMENT_STATUSES.map((status) => (
@@ -247,10 +191,8 @@ export function PaymentsPage() {
             ))}
           </select>
           <select
-            value={editForm.currency}
-            onChange={(e) =>
-              setEditForm({ ...editForm, currency: e.target.value })
-            }
+            value={form.currency}
+            onChange={(e) => setForm({ ...form, currency: e.target.value })}
             required
           >
             {COMMON_CURRENCIES.map((currency) => (
@@ -262,29 +204,117 @@ export function PaymentsPage() {
           <input
             placeholder="Amount"
             type="number"
-            value={editForm.amount}
+            value={form.amount}
             onChange={(e) =>
-              setEditForm({ ...editForm, amount: Number(e.target.value) })
+              setForm({ ...form, amount: Number(e.target.value) })
             }
             required
           />
           <input
             placeholder="Received At ISO"
-            value={editForm.receivedAt}
-            onChange={(e) =>
-              setEditForm({ ...editForm, receivedAt: e.target.value })
-            }
+            value={form.receivedAt}
+            onChange={(e) => setForm({ ...form, receivedAt: e.target.value })}
             required
           />
-          <div className="actions-inline">
-            <button className="btn" type="submit" disabled={updating}>
-              {updating ? "Updating..." : "Save Changes"}
-            </button>
-            <button className="btn ghost" type="button" onClick={onCancelEdit}>
-              Cancel
-            </button>
-          </div>
+          <button className="btn" type="submit" disabled={creating}>
+            {creating ? "Saving..." : "Add Payment"}
+          </button>
         </form>
+      </FormModal>
+
+      {editTarget ? (
+        <FormModal
+          isOpen={!!editTarget}
+          title="Edit Payment"
+          onClose={onCancelEdit}
+        >
+          <form className="form-grid" onSubmit={onSubmitEdit}>
+            <select
+              value={editForm.invoiceId}
+              onChange={(e) =>
+                setEditForm({ ...editForm, invoiceId: e.target.value })
+              }
+              required
+            >
+              <option value="" disabled>
+                Select invoice
+              </option>
+              {invoices.map((invoice) => (
+                <option key={invoice.id} value={invoice.id}>
+                  {invoice.invoiceNumber ?? invoice.id} • {invoice.status}
+                </option>
+              ))}
+            </select>
+            <select
+              value={editForm.provider}
+              onChange={(e) =>
+                setEditForm({ ...editForm, provider: e.target.value })
+              }
+              required
+            >
+              {PAYMENT_PROVIDERS.map((provider) => (
+                <option key={provider} value={provider}>
+                  {provider}
+                </option>
+              ))}
+            </select>
+            <select
+              value={editForm.status}
+              onChange={(e) =>
+                setEditForm({ ...editForm, status: e.target.value })
+              }
+              required
+            >
+              {PAYMENT_STATUSES.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+            <select
+              value={editForm.currency}
+              onChange={(e) =>
+                setEditForm({ ...editForm, currency: e.target.value })
+              }
+              required
+            >
+              {COMMON_CURRENCIES.map((currency) => (
+                <option key={currency} value={currency}>
+                  {currency}
+                </option>
+              ))}
+            </select>
+            <input
+              placeholder="Amount"
+              type="number"
+              value={editForm.amount}
+              onChange={(e) =>
+                setEditForm({ ...editForm, amount: Number(e.target.value) })
+              }
+              required
+            />
+            <input
+              placeholder="Received At ISO"
+              value={editForm.receivedAt}
+              onChange={(e) =>
+                setEditForm({ ...editForm, receivedAt: e.target.value })
+              }
+              required
+            />
+            <div className="actions-inline">
+              <button className="btn" type="submit" disabled={updating}>
+                {updating ? "Updating..." : "Save Changes"}
+              </button>
+              <button
+                className="btn ghost"
+                type="button"
+                onClick={onCancelEdit}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </FormModal>
       ) : null}
 
       {isLoading ? (
@@ -332,4 +362,3 @@ export function PaymentsPage() {
     </div>
   );
 }
-

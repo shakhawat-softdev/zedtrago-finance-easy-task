@@ -14,6 +14,7 @@ import {
   toastSuccess,
   toastWarning,
 } from "../../utils/notify";
+import { FormModal } from "../../components/modal/FormModal";
 
 type CurrencyRow = CurrencyRate & { id: string };
 
@@ -28,6 +29,7 @@ export function CurrencyPage() {
   const [updateCurrencyRate, { isLoading: updating }] =
     useUpdateCurrencyRateMutation();
   const [deleteCurrencyRate] = useDeleteCurrencyRateMutation();
+  const [openCreateModal, setOpenCreateModal] = useState(false);
   const [form, setForm] = useState<CurrencyRate>({
     fromCurrency: "AUD",
     toCurrency: "MYR",
@@ -51,6 +53,7 @@ export function CurrencyPage() {
     event.preventDefault();
     try {
       await createCurrencyRate({ ...form, rate: Number(form.rate) }).unwrap();
+      setOpenCreateModal(false);
       toastSuccess("Currency rate created successfully");
       refetch();
     } catch {
@@ -108,64 +111,27 @@ export function CurrencyPage() {
 
   return (
     <div className="section-stack">
-      <form className="card form-grid" onSubmit={onSubmit}>
+      <div className="card module-header">
         <h2>Currency Rates</h2>
-        <select
-          value={form.fromCurrency}
-          onChange={(event) =>
-            setForm({ ...form, fromCurrency: event.target.value })
-          }
-          required
+        <button
+          className="btn"
+          type="button"
+          onClick={() => setOpenCreateModal(true)}
         >
-          {COMMON_CURRENCIES.map((currency) => (
-            <option key={currency} value={currency}>
-              {currency}
-            </option>
-          ))}
-        </select>
-        <select
-          value={form.toCurrency}
-          onChange={(event) =>
-            setForm({ ...form, toCurrency: event.target.value })
-          }
-          required
-        >
-          {COMMON_CURRENCIES.map((currency) => (
-            <option key={currency} value={currency}>
-              {currency}
-            </option>
-          ))}
-        </select>
-        <input
-          placeholder="Rate"
-          type="number"
-          step="0.0001"
-          value={form.rate}
-          onChange={(event) =>
-            setForm({ ...form, rate: Number(event.target.value) })
-          }
-          required
-        />
-        <input
-          placeholder="Rate Date"
-          value={form.rateDate}
-          onChange={(event) =>
-            setForm({ ...form, rateDate: event.target.value })
-          }
-          required
-        />
-        <button className="btn" type="submit" disabled={creating}>
-          {creating ? "Saving..." : "Add Rate"}
+          Add Rate
         </button>
-      </form>
+      </div>
 
-      {editTarget ? (
-        <form className="card form-grid" onSubmit={onSubmitEdit}>
-          <h2>Edit Currency Rate</h2>
+      <FormModal
+        isOpen={openCreateModal}
+        title="Add Currency Rate"
+        onClose={() => setOpenCreateModal(false)}
+      >
+        <form className="form-grid" onSubmit={onSubmit}>
           <select
-            value={editForm.fromCurrency}
+            value={form.fromCurrency}
             onChange={(event) =>
-              setEditForm({ ...editForm, fromCurrency: event.target.value })
+              setForm({ ...form, fromCurrency: event.target.value })
             }
             required
           >
@@ -176,9 +142,9 @@ export function CurrencyPage() {
             ))}
           </select>
           <select
-            value={editForm.toCurrency}
+            value={form.toCurrency}
             onChange={(event) =>
-              setEditForm({ ...editForm, toCurrency: event.target.value })
+              setForm({ ...form, toCurrency: event.target.value })
             }
             required
           >
@@ -192,29 +158,91 @@ export function CurrencyPage() {
             placeholder="Rate"
             type="number"
             step="0.0001"
-            value={editForm.rate}
+            value={form.rate}
             onChange={(event) =>
-              setEditForm({ ...editForm, rate: Number(event.target.value) })
+              setForm({ ...form, rate: Number(event.target.value) })
             }
             required
           />
           <input
             placeholder="Rate Date"
-            value={editForm.rateDate}
+            value={form.rateDate}
             onChange={(event) =>
-              setEditForm({ ...editForm, rateDate: event.target.value })
+              setForm({ ...form, rateDate: event.target.value })
             }
             required
           />
-          <div className="actions-inline">
-            <button className="btn" type="submit" disabled={updating}>
-              {updating ? "Updating..." : "Save Changes"}
-            </button>
-            <button className="btn ghost" type="button" onClick={onCancelEdit}>
-              Cancel
-            </button>
-          </div>
+          <button className="btn" type="submit" disabled={creating}>
+            {creating ? "Saving..." : "Add Rate"}
+          </button>
         </form>
+      </FormModal>
+
+      {editTarget ? (
+        <FormModal
+          isOpen={!!editTarget}
+          title="Edit Currency Rate"
+          onClose={onCancelEdit}
+        >
+          <form className="form-grid" onSubmit={onSubmitEdit}>
+            <select
+              value={editForm.fromCurrency}
+              onChange={(event) =>
+                setEditForm({ ...editForm, fromCurrency: event.target.value })
+              }
+              required
+            >
+              {COMMON_CURRENCIES.map((currency) => (
+                <option key={currency} value={currency}>
+                  {currency}
+                </option>
+              ))}
+            </select>
+            <select
+              value={editForm.toCurrency}
+              onChange={(event) =>
+                setEditForm({ ...editForm, toCurrency: event.target.value })
+              }
+              required
+            >
+              {COMMON_CURRENCIES.map((currency) => (
+                <option key={currency} value={currency}>
+                  {currency}
+                </option>
+              ))}
+            </select>
+            <input
+              placeholder="Rate"
+              type="number"
+              step="0.0001"
+              value={editForm.rate}
+              onChange={(event) =>
+                setEditForm({ ...editForm, rate: Number(event.target.value) })
+              }
+              required
+            />
+            <input
+              placeholder="Rate Date"
+              value={editForm.rateDate}
+              onChange={(event) =>
+                setEditForm({ ...editForm, rateDate: event.target.value })
+              }
+              required
+            />
+            <div className="actions-inline">
+              <button className="btn" type="submit" disabled={updating}>
+                {updating ? "Updating..." : "Save Changes"}
+              </button>
+              <button
+                className="btn ghost"
+                type="button"
+                onClick={onCancelEdit}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </FormModal>
       ) : null}
 
       {isLoading ? (
@@ -255,4 +283,3 @@ export function CurrencyPage() {
     </div>
   );
 }
-

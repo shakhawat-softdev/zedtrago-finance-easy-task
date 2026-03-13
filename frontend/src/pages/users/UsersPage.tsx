@@ -3,6 +3,7 @@ import { CommonDataTable } from "../../utils/CommonDataTable";
 import { useGetUsersQuery, useUpdateUserMutation } from "../../services/api";
 import type { User } from "../../utils/types";
 import { toastError, toastSuccess } from "../../utils/notify";
+import { FormModal } from "../../components/modal/FormModal";
 
 export function UsersPage() {
   const { data = [], isLoading, refetch } = useGetUsersQuery();
@@ -49,58 +50,67 @@ export function UsersPage() {
   return (
     <div className="section-stack">
       {editTarget ? (
-        <form className="card form-grid" onSubmit={onSubmitEdit}>
-          <h2>Edit User</h2>
-          <input
-            placeholder="Full Name"
-            value={editForm.fullName}
-            onChange={(event) =>
-              setEditForm({ ...editForm, fullName: event.target.value })
-            }
-            required
-          />
-          <input
-            placeholder="Email"
-            type="email"
-            value={editForm.email}
-            onChange={(event) =>
-              setEditForm({ ...editForm, email: event.target.value })
-            }
-            required
-          />
-          <input
-            placeholder="Role"
-            value={editForm.role}
-            onChange={(event) =>
-              setEditForm({ ...editForm, role: event.target.value })
-            }
-            required
-          />
-          <input
-            placeholder="Status"
-            value={editForm.status}
-            onChange={(event) =>
-              setEditForm({ ...editForm, status: event.target.value })
-            }
-            required
-          />
-          <input
-            placeholder="Region"
-            value={editForm.region}
-            onChange={(event) =>
-              setEditForm({ ...editForm, region: event.target.value })
-            }
-            required
-          />
-          <div className="actions-inline">
-            <button className="btn" type="submit" disabled={updating}>
-              {updating ? "Updating..." : "Save Changes"}
-            </button>
-            <button className="btn ghost" type="button" onClick={onCancelEdit}>
-              Cancel
-            </button>
-          </div>
-        </form>
+        <FormModal
+          isOpen={!!editTarget}
+          title="Edit User"
+          onClose={onCancelEdit}
+        >
+          <form className="form-grid" onSubmit={onSubmitEdit}>
+            <input
+              placeholder="Full Name"
+              value={editForm.fullName}
+              onChange={(event) =>
+                setEditForm({ ...editForm, fullName: event.target.value })
+              }
+              required
+            />
+            <input
+              placeholder="Email"
+              type="email"
+              value={editForm.email}
+              onChange={(event) =>
+                setEditForm({ ...editForm, email: event.target.value })
+              }
+              required
+            />
+            <input
+              placeholder="Role"
+              value={editForm.role}
+              onChange={(event) =>
+                setEditForm({ ...editForm, role: event.target.value })
+              }
+              required
+            />
+            <input
+              placeholder="Status"
+              value={editForm.status}
+              onChange={(event) =>
+                setEditForm({ ...editForm, status: event.target.value })
+              }
+              required
+            />
+            <input
+              placeholder="Region"
+              value={editForm.region}
+              onChange={(event) =>
+                setEditForm({ ...editForm, region: event.target.value })
+              }
+              required
+            />
+            <div className="actions-inline">
+              <button className="btn" type="submit" disabled={updating}>
+                {updating ? "Updating..." : "Save Changes"}
+              </button>
+              <button
+                className="btn ghost"
+                type="button"
+                onClick={onCancelEdit}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </FormModal>
       ) : null}
 
       {isLoading ? (
@@ -134,4 +144,3 @@ export function UsersPage() {
     </div>
   );
 }
-

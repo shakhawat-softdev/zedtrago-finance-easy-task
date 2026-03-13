@@ -18,6 +18,7 @@ import {
   INTEGRATION_MODES,
   SUPPLIER_TYPES,
 } from "../../utils/formOptions";
+import { FormModal } from "../../components/modal/FormModal";
 
 export function SuppliersPage() {
   const { data = [], isLoading, refetch } = useGetSuppliersQuery();
@@ -31,6 +32,7 @@ export function SuppliersPage() {
     integrationMode: "api",
   });
   const [editTarget, setEditTarget] = useState<Supplier | null>(null);
+  const [openCreateModal, setOpenCreateModal] = useState(false);
   const [editForm, setEditForm] = useState({
     supplierName: "",
     supplierType: "",
@@ -48,6 +50,7 @@ export function SuppliersPage() {
         settlementCurrency: "AUD",
         integrationMode: "api",
       });
+      setOpenCreateModal(false);
       toastSuccess("Supplier created successfully");
       refetch();
     } catch {
@@ -107,72 +110,32 @@ export function SuppliersPage() {
 
   return (
     <div className="section-stack">
-      <form className="card form-grid" onSubmit={onSubmit}>
+      <div className="card module-header">
         <h2>Suppliers</h2>
-        <input
-          placeholder="Supplier Name"
-          value={form.supplierName}
-          onChange={(e) => setForm({ ...form, supplierName: e.target.value })}
-          required
-        />
-        <select
-          value={form.supplierType}
-          onChange={(e) => setForm({ ...form, supplierType: e.target.value })}
-          required
+        <button
+          className="btn"
+          type="button"
+          onClick={() => setOpenCreateModal(true)}
         >
-          {SUPPLIER_TYPES.map((supplierType) => (
-            <option key={supplierType} value={supplierType}>
-              {supplierType}
-            </option>
-          ))}
-        </select>
-        <select
-          value={form.settlementCurrency}
-          onChange={(e) =>
-            setForm({ ...form, settlementCurrency: e.target.value })
-          }
-          required
-        >
-          {COMMON_CURRENCIES.map((currency) => (
-            <option key={currency} value={currency}>
-              {currency}
-            </option>
-          ))}
-        </select>
-        <select
-          value={form.integrationMode}
-          onChange={(e) =>
-            setForm({ ...form, integrationMode: e.target.value })
-          }
-          required
-        >
-          {INTEGRATION_MODES.map((integrationMode) => (
-            <option key={integrationMode} value={integrationMode}>
-              {integrationMode}
-            </option>
-          ))}
-        </select>
-        <button className="btn" type="submit" disabled={creating}>
-          {creating ? "Saving..." : "Add Supplier"}
+          Add Supplier
         </button>
-      </form>
+      </div>
 
-      {editTarget ? (
-        <form className="card form-grid" onSubmit={onSubmitEdit}>
-          <h2>Edit Supplier</h2>
+      <FormModal
+        isOpen={openCreateModal}
+        title="Add Supplier"
+        onClose={() => setOpenCreateModal(false)}
+      >
+        <form className="form-grid" onSubmit={onSubmit}>
           <input
             placeholder="Supplier Name"
-            value={editForm.supplierName}
-            onChange={(e) =>
-              setEditForm({ ...editForm, supplierName: e.target.value })
-            }
+            value={form.supplierName}
+            onChange={(e) => setForm({ ...form, supplierName: e.target.value })}
             required
           />
           <select
-            value={editForm.supplierType}
-            onChange={(e) =>
-              setEditForm({ ...editForm, supplierType: e.target.value })
-            }
+            value={form.supplierType}
+            onChange={(e) => setForm({ ...form, supplierType: e.target.value })}
             required
           >
             {SUPPLIER_TYPES.map((supplierType) => (
@@ -182,9 +145,9 @@ export function SuppliersPage() {
             ))}
           </select>
           <select
-            value={editForm.settlementCurrency}
+            value={form.settlementCurrency}
             onChange={(e) =>
-              setEditForm({ ...editForm, settlementCurrency: e.target.value })
+              setForm({ ...form, settlementCurrency: e.target.value })
             }
             required
           >
@@ -195,9 +158,9 @@ export function SuppliersPage() {
             ))}
           </select>
           <select
-            value={editForm.integrationMode}
+            value={form.integrationMode}
             onChange={(e) =>
-              setEditForm({ ...editForm, integrationMode: e.target.value })
+              setForm({ ...form, integrationMode: e.target.value })
             }
             required
           >
@@ -207,15 +170,80 @@ export function SuppliersPage() {
               </option>
             ))}
           </select>
-          <div className="actions-inline">
-            <button className="btn" type="submit" disabled={updating}>
-              {updating ? "Updating..." : "Save Changes"}
-            </button>
-            <button className="btn ghost" type="button" onClick={onCancelEdit}>
-              Cancel
-            </button>
-          </div>
+          <button className="btn" type="submit" disabled={creating}>
+            {creating ? "Saving..." : "Add Supplier"}
+          </button>
         </form>
+      </FormModal>
+
+      {editTarget ? (
+        <FormModal
+          isOpen={!!editTarget}
+          title="Edit Supplier"
+          onClose={onCancelEdit}
+        >
+          <form className="form-grid" onSubmit={onSubmitEdit}>
+            <input
+              placeholder="Supplier Name"
+              value={editForm.supplierName}
+              onChange={(e) =>
+                setEditForm({ ...editForm, supplierName: e.target.value })
+              }
+              required
+            />
+            <select
+              value={editForm.supplierType}
+              onChange={(e) =>
+                setEditForm({ ...editForm, supplierType: e.target.value })
+              }
+              required
+            >
+              {SUPPLIER_TYPES.map((supplierType) => (
+                <option key={supplierType} value={supplierType}>
+                  {supplierType}
+                </option>
+              ))}
+            </select>
+            <select
+              value={editForm.settlementCurrency}
+              onChange={(e) =>
+                setEditForm({ ...editForm, settlementCurrency: e.target.value })
+              }
+              required
+            >
+              {COMMON_CURRENCIES.map((currency) => (
+                <option key={currency} value={currency}>
+                  {currency}
+                </option>
+              ))}
+            </select>
+            <select
+              value={editForm.integrationMode}
+              onChange={(e) =>
+                setEditForm({ ...editForm, integrationMode: e.target.value })
+              }
+              required
+            >
+              {INTEGRATION_MODES.map((integrationMode) => (
+                <option key={integrationMode} value={integrationMode}>
+                  {integrationMode}
+                </option>
+              ))}
+            </select>
+            <div className="actions-inline">
+              <button className="btn" type="submit" disabled={updating}>
+                {updating ? "Updating..." : "Save Changes"}
+              </button>
+              <button
+                className="btn ghost"
+                type="button"
+                onClick={onCancelEdit}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </FormModal>
       ) : null}
 
       {isLoading ? (
@@ -257,4 +285,3 @@ export function SuppliersPage() {
     </div>
   );
 }
-

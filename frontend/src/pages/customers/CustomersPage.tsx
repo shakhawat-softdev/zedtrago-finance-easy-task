@@ -13,6 +13,7 @@ import {
   toastSuccess,
   toastWarning,
 } from "../../utils/notify";
+import { FormModal } from "../../components/modal/FormModal";
 
 export function CustomersPage() {
   const { data = [], isLoading, refetch } = useGetCustomersQuery();
@@ -29,6 +30,7 @@ export function CustomersPage() {
   });
 
   const [editTarget, setEditTarget] = useState<Customer | null>(null);
+  const [openCreateModal, setOpenCreateModal] = useState(false);
   const [editForm, setEditForm] = useState({
     companyName: "",
     contactName: "",
@@ -48,6 +50,7 @@ export function CustomersPage() {
         market: "Malaysia",
         preferredCurrency: "MYR",
       });
+      setOpenCreateModal(false);
       toastSuccess("Customer created successfully");
       refetch();
     } catch {
@@ -118,99 +121,124 @@ export function CustomersPage() {
 
   return (
     <div className="section-stack">
-      <form className="card form-grid" onSubmit={onSubmit}>
+      <div className="card module-header">
         <h2>Customers</h2>
-        <input
-          placeholder="Company Name"
-          value={form.companyName}
-          onChange={(e) => setForm({ ...form, companyName: e.target.value })}
-          required
-        />
-        <input
-          placeholder="Contact Name"
-          value={form.contactName}
-          onChange={(e) => setForm({ ...form, contactName: e.target.value })}
-          required
-        />
-        <input
-          placeholder="Email"
-          type="email"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-          required
-        />
-        <input
-          placeholder="Market"
-          value={form.market}
-          onChange={(e) => setForm({ ...form, market: e.target.value })}
-          required
-        />
-        <input
-          placeholder="Preferred Currency"
-          value={form.preferredCurrency}
-          onChange={(e) =>
-            setForm({ ...form, preferredCurrency: e.target.value })
-          }
-          required
-        />
-        <button className="btn" type="submit" disabled={creating}>
-          {creating ? "Saving..." : "Add Customer"}
+        <button
+          className="btn"
+          type="button"
+          onClick={() => setOpenCreateModal(true)}
+        >
+          Add Customer
         </button>
-      </form>
+      </div>
 
-      {editTarget ? (
-        <form className="card form-grid" onSubmit={onSubmitEdit}>
-          <h2>Edit Customer</h2>
+      <FormModal
+        isOpen={openCreateModal}
+        title="Add Customer"
+        onClose={() => setOpenCreateModal(false)}
+      >
+        <form className="form-grid" onSubmit={onSubmit}>
           <input
             placeholder="Company Name"
-            value={editForm.companyName}
-            onChange={(e) =>
-              setEditForm({ ...editForm, companyName: e.target.value })
-            }
+            value={form.companyName}
+            onChange={(e) => setForm({ ...form, companyName: e.target.value })}
             required
           />
           <input
             placeholder="Contact Name"
-            value={editForm.contactName}
-            onChange={(e) =>
-              setEditForm({ ...editForm, contactName: e.target.value })
-            }
+            value={form.contactName}
+            onChange={(e) => setForm({ ...form, contactName: e.target.value })}
             required
           />
           <input
             placeholder="Email"
             type="email"
-            value={editForm.email}
-            onChange={(e) =>
-              setEditForm({ ...editForm, email: e.target.value })
-            }
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
             required
           />
           <input
             placeholder="Market"
-            value={editForm.market}
-            onChange={(e) =>
-              setEditForm({ ...editForm, market: e.target.value })
-            }
+            value={form.market}
+            onChange={(e) => setForm({ ...form, market: e.target.value })}
             required
           />
           <input
             placeholder="Preferred Currency"
-            value={editForm.preferredCurrency}
+            value={form.preferredCurrency}
             onChange={(e) =>
-              setEditForm({ ...editForm, preferredCurrency: e.target.value })
+              setForm({ ...form, preferredCurrency: e.target.value })
             }
             required
           />
-          <div className="actions-inline">
-            <button className="btn" type="submit" disabled={updating}>
-              {updating ? "Updating..." : "Save Changes"}
-            </button>
-            <button className="btn ghost" type="button" onClick={onCancelEdit}>
-              Cancel
-            </button>
-          </div>
+          <button className="btn" type="submit" disabled={creating}>
+            {creating ? "Saving..." : "Add Customer"}
+          </button>
         </form>
+      </FormModal>
+
+      {editTarget ? (
+        <FormModal
+          isOpen={!!editTarget}
+          title="Edit Customer"
+          onClose={onCancelEdit}
+        >
+          <form className="form-grid" onSubmit={onSubmitEdit}>
+            <input
+              placeholder="Company Name"
+              value={editForm.companyName}
+              onChange={(e) =>
+                setEditForm({ ...editForm, companyName: e.target.value })
+              }
+              required
+            />
+            <input
+              placeholder="Contact Name"
+              value={editForm.contactName}
+              onChange={(e) =>
+                setEditForm({ ...editForm, contactName: e.target.value })
+              }
+              required
+            />
+            <input
+              placeholder="Email"
+              type="email"
+              value={editForm.email}
+              onChange={(e) =>
+                setEditForm({ ...editForm, email: e.target.value })
+              }
+              required
+            />
+            <input
+              placeholder="Market"
+              value={editForm.market}
+              onChange={(e) =>
+                setEditForm({ ...editForm, market: e.target.value })
+              }
+              required
+            />
+            <input
+              placeholder="Preferred Currency"
+              value={editForm.preferredCurrency}
+              onChange={(e) =>
+                setEditForm({ ...editForm, preferredCurrency: e.target.value })
+              }
+              required
+            />
+            <div className="actions-inline">
+              <button className="btn" type="submit" disabled={updating}>
+                {updating ? "Updating..." : "Save Changes"}
+              </button>
+              <button
+                className="btn ghost"
+                type="button"
+                onClick={onCancelEdit}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </FormModal>
       ) : null}
 
       {isLoading ? (
@@ -253,4 +281,3 @@ export function CustomersPage() {
     </div>
   );
 }
-
