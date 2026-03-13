@@ -12,6 +12,10 @@ const MARKETS = ["Malaysia", "Australia"] as const;
 
 export function DashboardPage() {
   const [filters, setFilters] = useState<ReportFilter>({});
+  const hasActiveFilters =
+    Boolean(filters.fromDate) ||
+    Boolean(filters.toDate) ||
+    Boolean(filters.market);
 
   const { data: dashboard, isLoading: loadingDashboard } =
     useGetReportingDashboardQuery(
@@ -45,6 +49,7 @@ export function DashboardPage() {
     loadingPlSummary;
 
   const handleClearFilters = () => {
+    if (!hasActiveFilters) return;
     setFilters({});
   };
 
@@ -139,14 +144,12 @@ export function DashboardPage() {
               ))}
             </select>
           </div>
-          <div
-            style={{ display: "flex", alignItems: "flex-end", gap: "0.5rem" }}
-          >
+          <div className="filter-actions">
             <button
               type="button"
               onClick={handleClearFilters}
-              className="btn-secondary"
-              style={{ flexGrow: 1 }}
+              className="btn btn-filter-clear"
+              disabled={!hasActiveFilters}
             >
               Clear Filters
             </button>

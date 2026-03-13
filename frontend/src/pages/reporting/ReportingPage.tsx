@@ -15,6 +15,10 @@ const MARKETS = ["Malaysia", "Australia"] as const;
 
 export function ReportingPage() {
   const [filters, setFilters] = useState<ReportFilter>({});
+  const hasActiveFilters =
+    Boolean(filters.fromDate) ||
+    Boolean(filters.toDate) ||
+    Boolean(filters.market);
 
   const { data: arAging, isLoading: loadingAr } = useGetReportingArAgingQuery(
     filters.fromDate || filters.toDate || filters.market ? filters : undefined,
@@ -45,6 +49,7 @@ export function ReportingPage() {
     );
 
   const handleClearFilters = () => {
+    if (!hasActiveFilters) return;
     setFilters({});
   };
 
@@ -94,14 +99,12 @@ export function ReportingPage() {
               ))}
             </select>
           </div>
-          <div
-            style={{ display: "flex", alignItems: "flex-end", gap: "0.5rem" }}
-          >
+          <div className="filter-actions">
             <button
               type="button"
               onClick={handleClearFilters}
-              className="btn-secondary"
-              style={{ flexGrow: 1 }}
+              className="btn btn-filter-clear"
+              disabled={!hasActiveFilters}
             >
               Clear Filters
             </button>
@@ -212,4 +215,3 @@ export function ReportingPage() {
     </div>
   );
 }
-

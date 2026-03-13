@@ -22,7 +22,10 @@ export function LoginPage({ loading, onSubmit }: LoginPageProps) {
     <div className="auth-shell">
       <form className="auth-card" onSubmit={handleSubmit}>
         <div className="auth-intro">
-          <span className="eyebrow-label">Zedtrago Platform</span>
+          <div className="auth-brand-row">
+            <span className="eyebrow-label">Zedtrago Platform</span>
+            <span className="auth-security-pill">Secure Access</span>
+          </div>
           <h2>
             Professional finance workspace for multi-service travel operations.
           </h2>
@@ -34,11 +37,16 @@ export function LoginPage({ loading, onSubmit }: LoginPageProps) {
 
         <div className="auth-grid">
           <div className="auth-panel">
+            <h3>Sign In</h3>
+            <p className="auth-panel-copy">
+              Use your finance operations credentials to continue.
+            </p>
             <label>Email</label>
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="email"
+              placeholder="finance@zedtrago.com"
               required
             />
             <label>Password</label>
@@ -46,6 +54,7 @@ export function LoginPage({ loading, onSubmit }: LoginPageProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type="password"
+              placeholder="Enter your password"
               required
             />
             <button className="btn" type="submit" disabled={loading}>
@@ -53,21 +62,28 @@ export function LoginPage({ loading, onSubmit }: LoginPageProps) {
             </button>
           </div>
 
-          <div className="auth-note">
-            <strong>Demo Access</strong>
+          <aside className="auth-note">
+            <h3>Finance Command Center</h3>
             <p>
-              Use the seeded finance credentials to review the connected
-              frontend experience.
+              Centralize receivables, payables, reconciliations, and reporting
+              with a secure workspace designed for daily finance operations.
             </p>
+
             <div className="auth-credential">
-              <span>Email</span>
-              <strong>finance@zedtrago.com</strong>
+              <span>Compliance Coverage</span>
+              <strong>SST (MY) and GST (AU) Ready</strong>
             </div>
             <div className="auth-credential">
-              <span>Password</span>
-              <strong>Passw0rd!</strong>
+              <span>Service Reliability</span>
+              <strong>Continuous API Monitoring Enabled</strong>
             </div>
-          </div>
+
+            <ul className="auth-feature-list">
+              <li>Role-based access for finance teams</li>
+              <li>Real-time booking to ledger visibility</li>
+              <li>Audit-ready transaction lifecycle records</li>
+            </ul>
+          </aside>
         </div>
       </form>
     </div>
