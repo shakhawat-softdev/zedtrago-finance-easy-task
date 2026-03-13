@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { useGetMeQuery, useLoginMutation } from "../services/api";
 import {
   clearAuthStorage,
@@ -9,10 +9,38 @@ import {
 } from "../utils/authStorage";
 import type { AuthTokenPayload, AuthUser, LoginPayload } from "../utils/types";
 
+type AuthSnapshot = {
+  token: string | null;
+  user: AuthUser | null;
+};
+
+let authSnapshot: AuthSnapshot = {
+  token: getToken(),
+  user: getStoredUser<AuthUser>(),
+};
+
+const authListeners = new Set<() => void>();
+
+function subscribeAuth(listener: () => void) {
+  authListeners.add(listener);
+  return () => authListeners.delete(listener);
+}
+
+function setAuthSnapshot(next: AuthSnapshot) {
+  authSnapshot = next;
+  authListeners.forEach((listener) => listener());
+}
+
 export function useAuth() {
-  const [token, setTokenState] = useState<string | null>(() => getToken());
-  const [user, setUser] = useState<AuthUser | null>(() =>
-    getStoredUser<AuthUser>(),
+  const token = useSyncExternalStore(
+    subscribeAuth,
+    () => authSnapshot.token,
+    () => authSnapshot.token,
+  );
+  const user = useSyncExternalStore(
+    subscribeAuth,
+    () => authSnapshot.user,
+    () => authSnapshot.user,
   );
   const [loginMutation, loginState] = useLoginMutation();
 
@@ -31,19 +59,31 @@ export function useAuth() {
     } as AuthUser;
   }, [me, user]);
 
+  useEffect(() => {
+    if (!token || user || !me) return;
+
+    const nextUser: AuthUser = {
+      id: me.sub,
+      email: me.email,
+      role: me.role,
+      fullName: "Finance User",
+    };
+
+    setStoredUser(nextUser);
+    setAuthSnapshot({ token, user: nextUser });
+  }, [me, token, user]);
+
   async function login(payload: LoginPayload) {
     const response = await loginMutation(payload).unwrap();
     setToken(response.accessToken);
-    setTokenState(response.accessToken);
     setStoredUser(response.user);
-    setUser(response.user);
+    setAuthSnapshot({ token: response.accessToken, user: response.user });
     return response;
   }
 
   function logout() {
     clearAuthStorage();
-    setTokenState(null);
-    setUser(null);
+    setAuthSnapshot({ token: null, user: null });
   }
 
   return {

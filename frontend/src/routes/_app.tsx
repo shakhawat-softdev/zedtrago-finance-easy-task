@@ -4,6 +4,8 @@ import { Navbar } from "../components/navbar/Navbar";
 import { Sidebar } from "../components/sidebar/Sidebar";
 import { useAuth } from "../hooks/useAuth";
 import { useRouterState } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { getToken } from "../utils/authStorage";
 
 const PAGE_META: Record<string, { title: string; subtitle: string }> = {
   "/": {
@@ -68,6 +70,7 @@ const PAGE_META: Record<string, { title: string; subtitle: string }> = {
 };
 
 function AppLayout() {
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
@@ -75,7 +78,7 @@ function AppLayout() {
 
   function handleLogout() {
     logout();
-    window.location.assign("/login");
+    navigate({ to: "/login", replace: true });
   }
 
   return (
@@ -102,7 +105,7 @@ export const Route = createRoute({
   getParentRoute: () => RootRoute,
   id: "_app",
   beforeLoad: ({ context }) => {
-    if (!context.isAuthenticated) {
+    if (!context.isAuthenticated && !getToken()) {
       throw redirect({ to: "/login" });
     }
   },
