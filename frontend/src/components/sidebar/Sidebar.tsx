@@ -1,38 +1,23 @@
-export type MenuKey =
-  | "dashboard"
-  | "reporting"
-  | "ledger"
-  | "integrations"
-  | "customers"
-  | "bookings"
-  | "invoices"
-  | "payments"
-  | "suppliers"
-  | "commissions"
-  | "currency"
-  | "users";
+import { Link, useMatchRoute } from "@tanstack/react-router";
 
-type SidebarProps = {
-  active: MenuKey;
-  onSelect: (key: MenuKey) => void;
-};
-
-const MENU: Array<{ key: MenuKey; label: string; icon: string }> = [
-  { key: "dashboard", label: "Dashboard", icon: "01" },
-  { key: "reporting", label: "Reporting", icon: "02" },
-  { key: "ledger", label: "Ledger", icon: "03" },
-  { key: "integrations", label: "Integrations", icon: "04" },
-  { key: "customers", label: "Customers", icon: "05" },
-  { key: "bookings", label: "Bookings", icon: "06" },
-  { key: "invoices", label: "Invoices", icon: "07" },
-  { key: "payments", label: "Payments", icon: "08" },
-  { key: "suppliers", label: "Suppliers", icon: "09" },
-  { key: "commissions", label: "Commissions", icon: "10" },
-  { key: "currency", label: "Currency", icon: "11" },
-  { key: "users", label: "Users", icon: "12" },
+const MENU: Array<{ path: string; label: string; icon: string }> = [
+  { path: "/", label: "Dashboard", icon: "01" },
+  { path: "/reporting", label: "Reporting", icon: "02" },
+  { path: "/ledger", label: "Ledger", icon: "03" },
+  { path: "/integrations", label: "Integrations", icon: "04" },
+  { path: "/customers", label: "Customers", icon: "05" },
+  { path: "/bookings", label: "Bookings", icon: "06" },
+  { path: "/invoices", label: "Invoices", icon: "07" },
+  { path: "/payments", label: "Payments", icon: "08" },
+  { path: "/suppliers", label: "Suppliers", icon: "09" },
+  { path: "/commissions", label: "Commissions", icon: "10" },
+  { path: "/currency", label: "Currency", icon: "11" },
+  { path: "/users", label: "Users", icon: "12" },
 ];
 
-export function Sidebar({ active, onSelect }: SidebarProps) {
+export function Sidebar() {
+  const matchRoute = useMatchRoute();
+
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -43,16 +28,22 @@ export function Sidebar({ active, onSelect }: SidebarProps) {
         </div>
       </div>
       <nav className="sidebar-nav">
-        {MENU.map((item) => (
-          <button
-            key={item.key}
-            className={`menu-item ${active === item.key ? "active" : ""}`}
-            onClick={() => onSelect(item.key)}
-          >
-            <span className="menu-icon">{item.icon}</span>
-            <span>{item.label}</span>
-          </button>
-        ))}
+        {MENU.map((item) => {
+          const isActive = !!matchRoute({
+            to: item.path,
+            fuzzy: item.path === "/" ? false : true,
+          });
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`menu-item ${isActive ? "active" : ""}`}
+            >
+              <span className="menu-icon">{item.icon}</span>
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
       </nav>
     </aside>
   );

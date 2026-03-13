@@ -35,6 +35,7 @@ The proposed platform is designed to support:
 ### Frontend
 
 - React
+- TanStack Router
 - Vite
 - TypeScript
 
