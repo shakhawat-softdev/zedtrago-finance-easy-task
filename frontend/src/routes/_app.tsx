@@ -73,6 +73,11 @@ function AppLayout() {
   const pathname = routerState.location.pathname;
   const meta = PAGE_META[pathname] ?? PAGE_META["/"];
 
+  function handleLogout() {
+    logout();
+    window.location.assign("/login");
+  }
+
   return (
     <div className="app-shell">
       <Sidebar />
@@ -83,7 +88,7 @@ function AppLayout() {
           title={meta.title}
           subtitle={meta.subtitle}
           userEmail={user?.email}
-          onLogout={logout}
+          onLogout={handleLogout}
         />
         <section className="page-content">
           <Outlet />
