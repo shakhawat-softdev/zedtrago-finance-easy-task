@@ -39,7 +39,7 @@ export function Sidebar() {
     Record<string, boolean>
   >({
     Overview: true,
-    Operations: false,
+    Operations: true,
     Administration: false,
   });
 
@@ -64,6 +64,10 @@ export function Sidebar() {
   }, [activeSection]);
 
   function toggleSection(title: string) {
+    if (title === "Operations") {
+      return;
+    }
+
     setExpandedSections((prev) => ({
       ...prev,
       [title]: !prev[title],
@@ -79,42 +83,43 @@ export function Sidebar() {
           <p className="sidebar-caption">Travel finance operations</p>
         </div>
       </div>
-      {MENU_SECTIONS.map((section) => (
-        <div key={section.title} className="sidebar-section">
-          <button
-            className="sidebar-section-toggle"
-            type="button"
-            onClick={() => toggleSection(section.title)}
-            aria-expanded={!!expandedSections[section.title]}
-          >
-            <h4 className="sidebar-section-title">{section.title}</h4>
-            <span className="sidebar-section-caret" aria-hidden="true">
-              {expandedSections[section.title] ? "-" : "+"}
-            </span>
-          </button>
-          <nav
-            className={`sidebar-nav ${
-              expandedSections[section.title] ? "" : "collapsed"
-            }`}
-          >
-            {section.items.map((item) => {
-              const isActive = !!matchRoute({
-                to: item.path,
-                fuzzy: item.path === "/" ? false : true,
-              });
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`menu-item ${isActive ? "active" : ""}`}
-                >
-                  <span className="menu-text">{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-      ))}
+      {MENU_SECTIONS.map((section) => {
+        const isExpanded =
+          section.title === "Operations" || !!expandedSections[section.title];
+
+        return (
+          <div key={section.title} className="sidebar-section">
+            <button
+              className="sidebar-section-toggle"
+              type="button"
+              onClick={() => toggleSection(section.title)}
+              aria-expanded={isExpanded}
+            >
+              <h4 className="sidebar-section-title">{section.title}</h4>
+              <span className="sidebar-section-caret" aria-hidden="true">
+                {isExpanded ? "-" : "+"}
+              </span>
+            </button>
+            <nav className={`sidebar-nav ${isExpanded ? "" : "collapsed"}`}>
+              {section.items.map((item) => {
+                const isActive = !!matchRoute({
+                  to: item.path,
+                  fuzzy: item.path === "/" ? false : true,
+                });
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`menu-item ${isActive ? "active" : ""}`}
+                  >
+                    <span className="menu-text">{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        );
+      })}
     </aside>
   );
 }

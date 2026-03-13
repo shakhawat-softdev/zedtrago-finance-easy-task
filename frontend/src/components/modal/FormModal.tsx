@@ -27,6 +27,11 @@ export function FormModal({
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
+    const previousCount = Number(document.body.dataset.modalOpenCount || "0");
+    const nextCount = previousCount + 1;
+    document.body.dataset.modalOpenCount = String(nextCount);
+    document.body.classList.add("modal-open");
+
     previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
     dialogRef.current?.focus();
 
@@ -41,6 +46,14 @@ export function FormModal({
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
+
+      const currentCount = Number(document.body.dataset.modalOpenCount || "1");
+      const updatedCount = Math.max(0, currentCount - 1);
+      document.body.dataset.modalOpenCount = String(updatedCount);
+      if (updatedCount === 0) {
+        document.body.classList.remove("modal-open");
+      }
+
       previouslyFocusedRef.current?.focus();
     };
   }, [isOpen]);

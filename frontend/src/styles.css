@@ -134,6 +134,15 @@ select {
   margin-bottom: 12px;
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(16px);
+  transition:
+    filter 0.2s ease,
+    opacity 0.2s ease;
+}
+
+body.modal-open .topbar {
+  filter: blur(3px) saturate(0.8);
+  opacity: 0.55;
+  pointer-events: none;
 }
 
 .topbar-head {
