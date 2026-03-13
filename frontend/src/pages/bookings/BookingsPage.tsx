@@ -251,18 +251,26 @@ export function BookingsPage() {
           <input
             placeholder="Gross Amount"
             type="number"
-            value={form.grossAmount}
+            value={Number.isNaN(form.grossAmount) ? "" : form.grossAmount}
             onChange={(e) =>
-              setForm({ ...form, grossAmount: Number(e.target.value) })
+              setForm({
+                ...form,
+                grossAmount:
+                  e.target.value === "" ? Number.NaN : Number(e.target.value),
+              })
             }
             required
           />
           <input
             placeholder="Net Amount"
             type="number"
-            value={form.netAmount}
+            value={Number.isNaN(form.netAmount) ? "" : form.netAmount}
             onChange={(e) =>
-              setForm({ ...form, netAmount: Number(e.target.value) })
+              setForm({
+                ...form,
+                netAmount:
+                  e.target.value === "" ? Number.NaN : Number(e.target.value),
+              })
             }
             required
           />
@@ -359,11 +367,14 @@ export function BookingsPage() {
             <input
               placeholder="Gross Amount"
               type="number"
-              value={editForm.grossAmount}
+              value={
+                Number.isNaN(editForm.grossAmount) ? "" : editForm.grossAmount
+              }
               onChange={(e) =>
                 setEditForm({
                   ...editForm,
-                  grossAmount: Number(e.target.value),
+                  grossAmount:
+                    e.target.value === "" ? Number.NaN : Number(e.target.value),
                 })
               }
               required
@@ -371,9 +382,13 @@ export function BookingsPage() {
             <input
               placeholder="Net Amount"
               type="number"
-              value={editForm.netAmount}
+              value={Number.isNaN(editForm.netAmount) ? "" : editForm.netAmount}
               onChange={(e) =>
-                setEditForm({ ...editForm, netAmount: Number(e.target.value) })
+                setEditForm({
+                  ...editForm,
+                  netAmount:
+                    e.target.value === "" ? Number.NaN : Number(e.target.value),
+                })
               }
               required
             />

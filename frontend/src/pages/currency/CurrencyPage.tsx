@@ -158,9 +158,15 @@ export function CurrencyPage() {
             placeholder="Rate"
             type="number"
             step="0.0001"
-            value={form.rate}
+            value={Number.isNaN(form.rate) ? "" : form.rate}
             onChange={(event) =>
-              setForm({ ...form, rate: Number(event.target.value) })
+              setForm({
+                ...form,
+                rate:
+                  event.target.value === ""
+                    ? Number.NaN
+                    : Number(event.target.value),
+              })
             }
             required
           />
@@ -215,9 +221,15 @@ export function CurrencyPage() {
               placeholder="Rate"
               type="number"
               step="0.0001"
-              value={editForm.rate}
+              value={Number.isNaN(editForm.rate) ? "" : editForm.rate}
               onChange={(event) =>
-                setEditForm({ ...editForm, rate: Number(event.target.value) })
+                setEditForm({
+                  ...editForm,
+                  rate:
+                    event.target.value === ""
+                      ? Number.NaN
+                      : Number(event.target.value),
+                })
               }
               required
             />

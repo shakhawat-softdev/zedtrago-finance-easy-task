@@ -116,9 +116,15 @@ export function LedgerPage() {
           <input
             placeholder="Debit Amount"
             type="number"
-            value={form.debitAmount}
+            value={Number.isNaN(form.debitAmount) ? "" : form.debitAmount}
             onChange={(event) =>
-              setForm({ ...form, debitAmount: Number(event.target.value) })
+              setForm({
+                ...form,
+                debitAmount:
+                  event.target.value === ""
+                    ? Number.NaN
+                    : Number(event.target.value),
+              })
             }
             required
           />
@@ -141,9 +147,15 @@ export function LedgerPage() {
           <input
             placeholder="Credit Amount"
             type="number"
-            value={form.creditAmount}
+            value={Number.isNaN(form.creditAmount) ? "" : form.creditAmount}
             onChange={(event) =>
-              setForm({ ...form, creditAmount: Number(event.target.value) })
+              setForm({
+                ...form,
+                creditAmount:
+                  event.target.value === ""
+                    ? Number.NaN
+                    : Number(event.target.value),
+              })
             }
             required
           />

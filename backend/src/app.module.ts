@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { CommonModule } from "./common/common.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { UsersModule } from "./modules/users/users.module";
 import { CustomersModule } from "./modules/customers/customers.module";
@@ -21,7 +20,6 @@ import { IntegrationsModule } from "./modules/integrations/integrations.module";
       isGlobal: true,
       envFilePath: ".env",
     }),
-    CommonModule,
     AuthModule,
     UsersModule,
     CustomersModule,

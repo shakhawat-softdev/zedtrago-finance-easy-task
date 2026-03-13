@@ -204,9 +204,13 @@ export function PaymentsPage() {
           <input
             placeholder="Amount"
             type="number"
-            value={form.amount}
+            value={Number.isNaN(form.amount) ? "" : form.amount}
             onChange={(e) =>
-              setForm({ ...form, amount: Number(e.target.value) })
+              setForm({
+                ...form,
+                amount:
+                  e.target.value === "" ? Number.NaN : Number(e.target.value),
+              })
             }
             required
           />
@@ -287,9 +291,13 @@ export function PaymentsPage() {
             <input
               placeholder="Amount"
               type="number"
-              value={editForm.amount}
+              value={Number.isNaN(editForm.amount) ? "" : editForm.amount}
               onChange={(e) =>
-                setEditForm({ ...editForm, amount: Number(e.target.value) })
+                setEditForm({
+                  ...editForm,
+                  amount:
+                    e.target.value === "" ? Number.NaN : Number(e.target.value),
+                })
               }
               required
             />

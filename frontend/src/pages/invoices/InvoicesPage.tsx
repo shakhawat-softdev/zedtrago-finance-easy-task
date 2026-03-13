@@ -194,9 +194,13 @@ export function InvoicesPage() {
           <input
             placeholder="Total Amount"
             type="number"
-            value={form.totalAmount}
+            value={Number.isNaN(form.totalAmount) ? "" : form.totalAmount}
             onChange={(e) =>
-              setForm({ ...form, totalAmount: Number(e.target.value) })
+              setForm({
+                ...form,
+                totalAmount:
+                  e.target.value === "" ? Number.NaN : Number(e.target.value),
+              })
             }
             required
           />
@@ -271,11 +275,14 @@ export function InvoicesPage() {
             <input
               placeholder="Total Amount"
               type="number"
-              value={editForm.totalAmount}
+              value={
+                Number.isNaN(editForm.totalAmount) ? "" : editForm.totalAmount
+              }
               onChange={(e) =>
                 setEditForm({
                   ...editForm,
-                  totalAmount: Number(e.target.value),
+                  totalAmount:
+                    e.target.value === "" ? Number.NaN : Number(e.target.value),
                 })
               }
               required

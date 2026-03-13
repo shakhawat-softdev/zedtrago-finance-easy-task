@@ -163,9 +163,15 @@ export function CommissionsPage() {
           <input
             placeholder="Amount"
             type="number"
-            value={form.amount}
+            value={Number.isNaN(form.amount) ? "" : form.amount}
             onChange={(event) =>
-              setForm({ ...form, amount: Number(event.target.value) })
+              setForm({
+                ...form,
+                amount:
+                  event.target.value === ""
+                    ? Number.NaN
+                    : Number(event.target.value),
+              })
             }
             required
           />
@@ -173,9 +179,15 @@ export function CommissionsPage() {
             placeholder="Rate"
             type="number"
             step="0.01"
-            value={form.rate}
+            value={Number.isNaN(form.rate) ? "" : form.rate}
             onChange={(event) =>
-              setForm({ ...form, rate: Number(event.target.value) })
+              setForm({
+                ...form,
+                rate:
+                  event.target.value === ""
+                    ? Number.NaN
+                    : Number(event.target.value),
+              })
             }
             required
           />
@@ -224,9 +236,15 @@ export function CommissionsPage() {
             <input
               placeholder="Amount"
               type="number"
-              value={editForm.amount}
+              value={Number.isNaN(editForm.amount) ? "" : editForm.amount}
               onChange={(event) =>
-                setEditForm({ ...editForm, amount: Number(event.target.value) })
+                setEditForm({
+                  ...editForm,
+                  amount:
+                    event.target.value === ""
+                      ? Number.NaN
+                      : Number(event.target.value),
+                })
               }
               required
             />
@@ -234,9 +252,15 @@ export function CommissionsPage() {
               placeholder="Rate"
               type="number"
               step="0.01"
-              value={editForm.rate}
+              value={Number.isNaN(editForm.rate) ? "" : editForm.rate}
               onChange={(event) =>
-                setEditForm({ ...editForm, rate: Number(event.target.value) })
+                setEditForm({
+                  ...editForm,
+                  rate:
+                    event.target.value === ""
+                      ? Number.NaN
+                      : Number(event.target.value),
+                })
               }
               required
             />
