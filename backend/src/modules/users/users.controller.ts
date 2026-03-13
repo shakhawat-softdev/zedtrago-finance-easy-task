@@ -7,13 +7,16 @@ import {
   ApiParam,
   ApiTags,
 } from "@nestjs/swagger";
+import { Roles } from "src/common/decorators/roles.decorator";
 import { AuthTokenGuard } from "src/common/guards/auth-token.guard";
+import { RolesGuard } from "src/common/guards/roles.guard";
 import { UserEntity } from "src/database/entities/user.entity";
 import { UsersService } from "./users.service";
 
 @ApiTags("Users")
 @ApiBearerAuth()
-@UseGuards(AuthTokenGuard)
+@UseGuards(AuthTokenGuard, RolesGuard)
+@Roles("finance_manager")
 @Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

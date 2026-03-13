@@ -24,6 +24,18 @@ The proposed platform is designed to support:
 - SST and GST reporting readiness
 - API-first integrations with payment gateways, booking suppliers, GDS, and CRM systems
 
+## Assignment Coverage
+
+This repository now covers each requested deliverable directly:
+
+- System architecture design: [docs/system-architecture-diagram.png](docs/system-architecture-diagram.png), [docs/system-architecture.mmd](docs/system-architecture.mmd)
+- ER diagram and database explanation: [docs/er-diagram.png](docs/er-diagram.png), [docs/er-diagram.mmd](docs/er-diagram.mmd)
+- Transaction lifecycle flow: [docs/transaction-flowchart.png](docs/transaction-flowchart.png), [docs/transaction-flowchart.mmd](docs/transaction-flowchart.mmd)
+- Technical solution proposal: [docs/system-overview.md](docs/system-overview.md), [docs/TECHNICAL-SPECIFICATION.md](docs/TECHNICAL-SPECIFICATION.md), [docs/ASSIGNMENT-COVERAGE.md](docs/ASSIGNMENT-COVERAGE.md)
+- NestJS backend implementation: modular controllers, services, DTOs, entities, guards, validation, exception filters, and Swagger under [backend/src](backend/src)
+- Swagger API documentation: `http://localhost:3000/api/docs`
+- Bonus items included: Docker Compose, seed script, and sample request models in Swagger
+
 ## Technology Stack
 
 ### Backend
@@ -55,7 +67,7 @@ The proposed platform is designed to support:
 The system follows a modular API-first architecture where operational business events drive accounting updates:
 
 1. Frontend dashboards and proposal interface consume backend APIs.
-2. NestJS modules handle customers, bookings, invoices, payments, commissions, suppliers, ledger posting, reporting, currency, and integrations.
+2. NestJS modules handle customers, bookings, invoices, payments, payables, commissions, suppliers, ledger posting, reporting, currency, and integrations.
 3. PostgreSQL stores normalized master and transaction data.
 4. Integrations receive webhooks and launch sync jobs for external systems.
 5. Reporting services generate real-time finance and compliance insights.
@@ -71,6 +83,7 @@ The design separates master data from transactional data and uses a ledger heade
 - bookings to invoices
 - invoices to payments
 - bookings to commissions
+- bookings to payables
 - ledger transactions to ledger entry lines
 - currency rates to revaluation and reporting workflows
 
@@ -84,6 +97,7 @@ The ER source is located in [docs/er-diagram.mmd](docs/er-diagram.mmd).
 - Booking Module: booking intake and operational transaction data
 - Invoice Module: invoice generation and receivable records
 - Payment Module: gateway collection records
+- Payables Module: supplier liabilities, settlement scheduling, and accounts payable tracking
 - Commission Module: commission accrual tracking
 - Supplier Module: supplier configuration and settlement metadata
 - Ledger Module: journal transaction posting
@@ -100,6 +114,8 @@ http://localhost:3000/api/docs
 ```
 
 The backend groups APIs by module and includes request examples for the core endpoints.
+
+Key API groups available in Swagger include auth, users, customers, bookings, invoices, payments, payables, commissions, suppliers, ledger, reporting, currency, and integrations.
 
 ## Setup Instructions
 
@@ -151,8 +167,29 @@ The `docs` folder includes:
 - `er-diagram.mmd`
 - `transaction-flowchart.png`
 - `transaction-flowchart.mmd`
+- `ASSIGNMENT-COVERAGE.md`
 
 The PNG files are included for direct review, and the Mermaid sources remain in the repository for editable diagram maintenance.
+
+## Backend Structure Summary
+
+The NestJS backend is organized by domain module and includes:
+
+- Controllers for API routes and Swagger grouping
+- Services for business workflow orchestration and sample data access
+- DTOs with `class-validator` decorators for input validation
+- Entities with `@nestjs/swagger` metadata for request and response models
+- Authentication and authorization guards for bearer token and role handling
+- Global validation and exception filtering configured in [backend/src/main.ts](backend/src/main.ts)
+- Production-oriented database settings documented in [backend/src/config/database.config.ts](backend/src/config/database.config.ts)
+
+## Technology Stack Rationale
+
+- Scalability: NestJS modules, event-driven integrations, PostgreSQL, and AWS-managed services support growth without immediate microservice complexity.
+- Performance: PostgreSQL handles transactional accounting workloads well, while React plus Vite keeps the operator UI responsive.
+- Security: JWT bearer authentication, role guards, input validation, and Swagger-documented authorization expectations reduce integration risk.
+- Maintainability: TypeScript across backend and frontend keeps contracts consistent and makes domain modules easier to evolve independently.
+- Integration-heavy finance: webhook handling, retry-ready architecture, and explicit accounting modules fit payment, supplier, CRM, and GDS workflows.
 
 ## Development Roadmap
 

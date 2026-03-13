@@ -7,14 +7,17 @@ import {
   ApiParam,
   ApiTags,
 } from "@nestjs/swagger";
+import { Roles } from "src/common/decorators/roles.decorator";
 import { AuthTokenGuard } from "src/common/guards/auth-token.guard";
+import { RolesGuard } from "src/common/guards/roles.guard";
 import { LedgerTransactionEntity } from "src/database/entities/ledger-transaction.entity";
 import { CreateLedgerTransactionDto } from "./dto/create-ledger-transaction.dto";
 import { LedgerService } from "./ledger.service";
 
 @ApiTags("Ledger")
 @ApiBearerAuth()
-@UseGuards(AuthTokenGuard)
+@UseGuards(AuthTokenGuard, RolesGuard)
+@Roles("finance_manager")
 @Controller("ledger")
 export class LedgerController {
   constructor(private readonly ledgerService: LedgerService) {}

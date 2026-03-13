@@ -5,6 +5,7 @@ import { CurrencyRateEntity } from "../entities/currency-rate.entity";
 import { CustomerEntity } from "../entities/customer.entity";
 import { InvoiceEntity } from "../entities/invoice.entity";
 import { LedgerTransactionEntity } from "../entities/ledger-transaction.entity";
+import { PayableEntity } from "../entities/payable.entity";
 import { PaymentEntity } from "../entities/payment.entity";
 import { SupplierEntity } from "../entities/supplier.entity";
 import { UserEntity } from "../entities/user.entity";
@@ -119,6 +120,31 @@ export const payments: PaymentEntity[] = [
     currency: "AUD",
     amount: 2480,
     receivedAt: "2026-03-10T11:00:00.000Z",
+  },
+];
+
+export const payables: PayableEntity[] = [
+  {
+    id: "payb-1001",
+    supplierId: "sup-001",
+    bookingId: "bok-1001",
+    invoiceId: "inv-1001",
+    status: "accrued",
+    currency: "AUD",
+    amount: 2200,
+    dueDate: "2026-03-25",
+    settlementBatch: "SETTLE-2026-03",
+  },
+  {
+    id: "payb-1002",
+    supplierId: "sup-002",
+    bookingId: "bok-1002",
+    invoiceId: "inv-1002",
+    status: "scheduled",
+    currency: "USD",
+    amount: 1310,
+    dueDate: "2026-03-28",
+    settlementBatch: "SETTLE-2026-03",
   },
 ];
 

@@ -6,13 +6,16 @@ import {
   ApiQuery,
   ApiTags,
 } from "@nestjs/swagger";
+import { Roles } from "src/common/decorators/roles.decorator";
 import { AuthTokenGuard } from "src/common/guards/auth-token.guard";
+import { RolesGuard } from "src/common/guards/roles.guard";
 import { ReportFilterDto } from "./dto/report-filter.dto";
 import { ReportingService } from "./reporting.service";
 
 @ApiTags("Reporting")
 @ApiBearerAuth()
-@UseGuards(AuthTokenGuard)
+@UseGuards(AuthTokenGuard, RolesGuard)
+@Roles("finance_manager", "operations_admin")
 @Controller("reporting")
 export class ReportingController {
   constructor(private readonly reportingService: ReportingService) {}

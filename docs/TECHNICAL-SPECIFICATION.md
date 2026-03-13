@@ -5,7 +5,8 @@
 This assignment submission presents a complete technical solution for implementing an accounting software system for a multi-service travel business. The solution includes a fully structured NestJS backend, professional React frontend, comprehensive documentation, and database design.
 
 **Submission includes:**
-- NestJS backend with 11+ modules and Swagger documentation
+
+- NestJS backend with 13 domain modules and Swagger documentation
 - React frontend with professional UI and navigation
 - PostgreSQL ER diagram and normalization strategy
 - Transaction workflow and system architecture diagrams
@@ -21,36 +22,42 @@ This assignment submission presents a complete technical solution for implementi
 The platform follows a **6-layer architecture** optimized for scalability, real-time financial visibility, and integration:
 
 #### Layer 1: Presentation Layer (React SPA)
+
 - Dashboard with KPI metrics and transaction views
 - Real-time financial data binding
 - Module navigation and documentation interface
 - Mobile-responsive design
 
 #### Layer 2: API Layer (NestJS REST)
-- 11+ domain-focused REST endpoints
+
+- 13 domain-focused module groups with REST endpoints
 - JWT-based authentication
 - Swagger auto-documentation at `/api/docs`
 - Centralized validation and error handling
 
 #### Layer 3: Business Logic Layer
+
 - Domain service implementations for each module
 - Validation rules and business constraints
 - Journal posting engines
 - Event-driven workflow orchestration
 
 #### Layer 4: Data Access Layer
-- TypeORM-based repository pattern
+
+- In-memory repository-style services in this demo implementation, with a TypeORM/PostgreSQL repository layer planned for production deployment
 - Query optimization and caching strategies
 - Transaction management
 - Audit trail logging
 
 #### Layer 5: Database Layer
+
 - PostgreSQL relational database
 - Normalized schema with master and transactional tables
 - Referential integrity and constraints
 - Optimized indexes for reporting queries
 
 #### Layer 6: Integration Layer
+
 - Payment gateway webhooks (Stripe, PayPal)
 - Supplier and GDS sync jobs
 - CRM platform connectors
@@ -59,15 +66,18 @@ The platform follows a **6-layer architecture** optimized for scalability, real-
 ### External Integrations
 
 **Payment Gateways:**
+
 - Stripe: Server-side API with signed webhooks, idempotent retries
 - PayPal: OAuth2 client credentials, webhook signature validation
 
 **Booking Platforms & Suppliers:**
+
 - Hotel APIs: Real-time availability and pricing sync
 - GDS Systems: Amadeus, Sabre integration with session management
 - Supplier reservation APIs: Confirmation and reconciliation
 
 **CRM & External Systems:**
+
 - Salesforce/Zoho: OAuth2-based customer sync
 - External accounting systems: Real-time ledger export
 
@@ -78,6 +88,7 @@ The platform follows a **6-layer architecture** optimized for scalability, real-
 ### Core Entities
 
 **Master Data Tables:**
+
 - `users` - System users with roles and market assignment
 - `customers` - B2B customers, agencies, and entities
 - `suppliers` - Travel suppliers with settlement terms
@@ -85,9 +96,11 @@ The platform follows a **6-layer architecture** optimized for scalability, real-
 - `currency_rates` - Daily FX rates for AUD, MYR, USD
 
 **Transactional Tables:**
+
 - `bookings` - Travel service bookings with status and amounts
 - `invoices` - Customer-facing invoices with tax details
 - `payments` - Payment collection records with gateway references
+- `payables` - Supplier liabilities, settlement schedules, and payable status
 - `commissions` - Commission accruals and settlements
 - `ledger_transactions` - Journal entry headers
 - `ledger_entry_lines` - Debit/credit entry rows
@@ -99,11 +112,13 @@ Customers → Bookings (one-to-many)
 Suppliers → Bookings (one-to-many)
 Bookings → Invoices (one-to-many)
 Invoices → Payments (one-to-many)
+Suppliers → Payables (one-to-many)
+Bookings → Payables (one-to-many)
 Bookings → Commissions (one-to-many)
 Bookings → Ledger Transactions (one-to-many)
 Ledger Transactions → Entry Lines (one-to-many)
 Accounts → Entry Lines (one-to-many)
-Currency Rates → Bookings, Invoices, Payments (many-to-one)
+Currency Rates → Bookings, Invoices, Payments, Payables (many-to-one)
 ```
 
 ### Normalization Strategy
@@ -118,6 +133,7 @@ Currency Rates → Bookings, Invoices, Payments (many-to-one)
 
 - **Booking to Invoice**: Cascading with status checks (confirmed bookings only)
 - **Invoice to Payment**: Partial payment support with remaining balance tracking
+- **Booking to Payable**: Supplier liabilities created only for confirmed or ticketed service obligations
 - **Ledger Posting**: Balanced entries enforced at database constraint level
 - **Multi-Currency**: FX rates captured at transaction time for auditability
 - **Idempotence**: Payment webhook and ledger posting marked with unique keys to prevent duplicates
@@ -129,6 +145,7 @@ Currency Rates → Bookings, Invoices, Payments (many-to-one)
 ### End-to-End Financial Flow
 
 **Step 1: Booking Creation**
+
 ```
 Customer requests travel service
 → System creates booking record
@@ -137,6 +154,7 @@ Customer requests travel service
 ```
 
 **Step 2: Supplier Confirmation**
+
 ```
 Supplier confirms availability
 → Booking status changes to CONFIRMED
@@ -144,6 +162,7 @@ Supplier confirms availability
 ```
 
 **Step 3: Invoice Generation**
+
 ```
 System generates customer invoice
 → Calculates tax (SST/GST as applicable)
@@ -152,6 +171,7 @@ System generates customer invoice
 ```
 
 **Step 4: Payment Processing**
+
 ```
 Customer pays via Stripe/PayPal
 → Webhook received and validated
@@ -160,6 +180,7 @@ Customer pays via Stripe/PayPal
 ```
 
 **Step 5: Ledger Entry Creation**
+
 ```
 Transaction event → Posting rule lookup
 → Debit AR account, Credit Revenue account
@@ -168,6 +189,7 @@ Transaction event → Posting rule lookup
 ```
 
 **Step 6: Supplier Settlement**
+
 ```
 Settlement batch created for supplier
 → Invoices sum to payable amount
@@ -177,6 +199,7 @@ Settlement batch created for supplier
 ```
 
 **Step 7: Financial Reporting**
+
 ```
 Reporting queries consume ledger transactions
 → KPI dashboard shows real-time balances
@@ -191,17 +214,20 @@ Reporting queries consume ledger transactions
 ### General Ledger Module
 
 **Responsibilities:**
+
 - Journal entry creation from operational events
 - Posting rule engine mapping events to GL accounts
 - Double-entry validation and balancing
 - Ledger transaction query and reporting
 
 **Interactions:**
+
 - Consumes: Booking CONFIRMED, Invoice ISSUED, Payment RECEIVED, Commission ACCRUED events
 - Produces: Balanced ledger entries
 - Contributes: General ledger for trial balance and financial statements
 
 **Example Posting Rule (Booking Confirmation):**
+
 ```
 Event: Booking CONFIRMED
 Amount: GrossAmount in booking_currency
@@ -216,12 +242,14 @@ Journal Entry:
 ### Accounts Receivable Module
 
 **Responsibilities:**
+
 - Invoice creation and tracking
 - Payment allocation and matching
 - Aging analysis and collection status
 - Credit limit enforcement
 
 **Interactions:**
+
 - Creates invoices from confirmed bookings
 - Matches payments to invoices
 - Generates AR aging reports
@@ -230,12 +258,14 @@ Journal Entry:
 ### Accounts Payable Module
 
 **Responsibilities:**
+
 - Supplier obligation tracking
 - Settlement batch creation
 - Payment scheduling and execution
 - Payable aging and reconciliation
 
 **Interactions:**
+
 - Accrues payables from bookings
 - Tracks supplier settlements
 - Generates AP aging reports
@@ -244,12 +274,14 @@ Journal Entry:
 ### Commission Management Module
 
 **Responsibilities:**
+
 - Commission accrual from bookings
 - Rate lookup and calculation
 - Payout batching and reconciliation
 - Margin analysis by booking and supplier
 
 **Interactions:**
+
 - Calculates commissions from booking amounts
 - Accrues commission expense
 - Batches settlements
@@ -258,12 +290,14 @@ Journal Entry:
 ### Multi-Currency Module
 
 **Responsibilities:**
+
 - Daily FX rate management
 - Currency conversion calculations
 - Realized and unrealized gain/loss
 - Multi-currency reporting
 
 **Interactions:**
+
 - Maintains daily rates for AUD, MYR, USD
 - Converts amounts at transaction time
 - Tracks FX impacts on ledger
@@ -272,12 +306,14 @@ Journal Entry:
 ### Financial Reporting Module
 
 **Responsibilities:**
+
 - KPI dashboard generation
 - Tax compliance reporting (SST, GST)
 - Reconciliation views
 - Analytics and trend analysis
 
 **Interactions:**
+
 - Queries ledger transactions and balances
 - Generates real-time dashboards
 - Exports tax-ready reports
@@ -290,6 +326,7 @@ Journal Entry:
 ### Payment Gateway Integration
 
 **Stripe Integration:**
+
 - Endpoint: `/api/payments/stripe/webhook`
 - Method: POST
 - Authentication: Webhook signature validation
@@ -297,6 +334,7 @@ Journal Entry:
 - Retry: Automatic retry queue for failed webhook processing
 
 **PayPal Integration:**
+
 - Endpoint: `/api/payments/paypal/webhook`
 - Method: POST
 - Authentication: OAuth2 token validation
@@ -306,6 +344,7 @@ Journal Entry:
 ### Booking Platform Integration
 
 **Supplier Sync Jobs:**
+
 - Endpoint: `/api/integrations/suppliers/sync`
 - Method: POST (triggered)
 - Polling: Daily sync via scheduled jobs
@@ -313,6 +352,7 @@ Journal Entry:
 - Correlation: Unique integration event IDs
 
 **GDS Integration:**
+
 - Endpoint: `/api/integrations/gds/sync`
 - Authentication: Session tokens
 - Message Format: XML/JSON translation layers
@@ -321,6 +361,7 @@ Journal Entry:
 ### CRM Platform Integration
 
 **Salesforce Connector:**
+
 - Authentication: OAuth2 with refresh token
 - Sync Direction: Bidirectional customer data
 - Event Deduplication: Field-level hash matching
@@ -336,17 +377,20 @@ Journal Entry:
 ### Data Synchronization Strategy
 
 **Real-time Sync (Webhooks):**
+
 - Payment confirmations
 - Supplier confirmations
 - Customer updates from CRM
 
 **Batch Sync (Scheduled Jobs):**
+
 - Daily supplier rate updates
 - FX rate updates
 - Reconciliation batches
 - Report exports
 
 **Error Handling:**
+
 - Retry queue with exponential backoff
 - Dead letter queue for unrecoverable failures
 - Alert thresholds for monitoring
@@ -406,68 +450,91 @@ backend/
 ### Module Implementations
 
 #### Auth Module
+
 **Services:**
+
 - `AuthService`: Login, token generation, validation
 - `JwtStrategy`: JWT token parsing and validation
 
 **Controllers:**
+
 - `AuthController`: POST /auth/login, GET /auth/me
 
 **DTOs:**
+
 - `LoginDto`: Email and password
 - `TokenResponseDto`: Access token and refresh token
 
 #### Customer Module
+
 **Services:**
+
 - `CustomersService`: CRUD operations, customer lookup
 
 **Controllers:**
+
 - `CustomersController`: GET /customers, POST /customers
 
 **Entities:**
+
 - `CustomerEntity`: Database model with market and currency fields
 
 #### Booking Module
+
 **Services:**
+
 - `BookingsService`: Create, update, status transitions
 - `BookingEventService`: Emit booking events
 
 **Controllers:**
+
 - `BookingsController`: Full CRUD for bookings
 - `BookingStatusController`: Status transitions
 
 #### Invoice Module
+
 **Services:**
+
 - `InvoicesService`: Generation, reconciliation
 - `TaxService`: SST/GST calculation
 
 **Controllers:**
+
 - `InvoicesController`: GET /invoices, POST /invoices/generate
 
-#### Payment Module  
+#### Payment Module
+
 **Services:**
+
 - `PaymentsService`: Payment recording
 - `StripeWebhookService`: Webhook processing
 - `PayPalWebhookService`: Webhook processing
 
 **Controllers:**
+
 - `PaymentsController`: GET /payments, POST /payments/record
 - `StripeWebhookController`: POST /payments/stripe/webhook
 - `PayPalWebhookController`: POST /payments/paypal/webhook
 
 #### Ledger Module
+
 **Services:**
+
 - `LedgerService`: Journal posting
 - `PostingRuleService`: Rule lookup and application
 
 **Controllers:**
+
 - `LedgerController`: GET /ledger/transactions, POST /ledger/entries
 
 #### Reporting Module
+
 **Services:**
+
 - `ReportingService`: KPI and financial report generation
 
 **Controllers:**
+
 - `ReportingController`: GET /reporting/dashboard, GET /reporting/tax-export
 
 ---
@@ -475,6 +542,7 @@ backend/
 ## 7. Swagger API Documentation
 
 The API is fully documented with Swagger and accessible at:
+
 ```
 http://localhost:3000/api/docs
 ```
@@ -482,51 +550,62 @@ http://localhost:3000/api/docs
 ### API Groups & Endpoints
 
 **Authentication (Auth Module)**
+
 - `POST /auth/login` - User login
 - `GET /auth/me` - Get current user
 
 **Users (User Module)**
+
 - `GET /users` - List users
 - `POST /users` - Create user
 
 **Customers (Customer Module)**
+
 - `GET /customers` - List customers
 - `POST /customers` - Create customer
 - `GET /customers/{id}` - Get customer details
 
 **Bookings (Booking Module)**
+
 - `GET /bookings` - List bookings
 - `POST /bookings` - Create booking
 - `GET /bookings/{id}` - Get booking details
 - `PATCH /bookings/{id}/status` - Update booking status
 
 **Invoices (Invoice Module)**
+
 - `GET /invoices` - List invoices
 - `POST /invoices` - Create invoice
 - `GET /invoices/{id}` - Get invoice details
 
 **Payments (Payment Module)**
+
 - `GET /payments` - List payments
 - `POST /payments` - Record payment
 - `POST /payments/stripe/webhook` - Stripe webhook
 
 **Commissions (Commission Module)**
+
 - `GET /commissions` - List commissions
 - `GET /commissions/settlements` - Batch settlements
 
 **Suppliers (Supplier Module)**
+
 - `GET /suppliers` - List suppliers
 - `POST /suppliers` - Create supplier
 
 **Ledger (Ledger Module)**
+
 - `GET /ledger/transactions` - List ledger transactions
 - `POST /ledger/entries` - Create journal entry
 
 **Currency (Currency Module)**
+
 - `GET /currency/rates` - Get daily FX rates
 - `POST /currency/rates` - Update rates
 
 **Reporting (Reporting Module)**
+
 - `GET /reporting/dashboard` - KPI dashboard
 - `GET /reporting/tax-export` - Tax compliance export
 
@@ -535,6 +614,7 @@ http://localhost:3000/api/docs
 ## 8. Technology Stack
 
 ### Backend
+
 - **Runtime**: Node.js 18+
 - **Framework**: NestJS 10+
 - **Language**: TypeScript 5+
@@ -544,6 +624,7 @@ http://localhost:3000/api/docs
 - **Validation**: class-validator, class-transformer
 
 ### Frontend
+
 - **Framework**: React 18+
 - **Build Tool**: Vite
 - **Language**: TypeScript
@@ -551,11 +632,13 @@ http://localhost:3000/api/docs
 - **State**: React hooks (useState)
 
 ### Database
+
 - **Primary**: PostgreSQL 14+
 - **Query Builder**: TypeORM QueryBuilder
 - **Migrations**: TypeORM CLI
 
 ### Infrastructure (Recommended)
+
 - **Compute**: AWS ECS/App Runner
 - **Database**: AWS RDS PostgreSQL
 - **Queue**: AWS SQS for retry/async jobs
@@ -565,28 +648,33 @@ http://localhost:3000/api/docs
 ### Why This Stack?
 
 **Scalability:**
+
 - NestJS modular architecture scales horizontally
 - PostgreSQL handles multi-million transaction volumes
 - AWS services auto-scale and partition by nature
 
 **Performance:**
+
 - TypeORM with query optimization and caching
 - React SPA for client-side performance
 - Database indexes on frequently queried dimensions
 
 **Security:**
+
 - JWT bearer tokens for stateless auth
 - Webhook signature validation (HMAC)
 - Row-level security policies for multi-tenancy
 - Data encryption in transit and at rest (AWS)
 
 **Maintainability:**
+
 - NestJS structure enforces clean architecture
 - Strong typing with TypeScript
 - Decorator-based dependency injection
 - Comprehensive API documentation via Swagger
 
 **Integration:**
+
 - REST APIs for webhook and third-party integration
 - Event-driven architecture for real-time updates
 - Standard OAuth2 for third-party auth
@@ -597,6 +685,7 @@ http://localhost:3000/api/docs
 ## 9. Implementation Roadmap
 
 ### Phase 1: Requirement Analysis & Architecture (Week 1)
+
 - [x] Domain modeling and entity relationships
 - [x] Event mapping and posting rule definition
 - [x] Architecture review and approval
@@ -604,12 +693,14 @@ http://localhost:3000/api/docs
 - [x] Database schema design
 
 **Deliverables:**
+
 - ER diagram with 10+ entities
 - System architecture diagram
 - Posting rule specifications
 - Technical design document
 
 ### Phase 2: Database & Infrastructure (Week 2)
+
 - [ ] PostgreSQL schema creation
 - [ ] TypeORM entities and migrations
 - [ ] Initial indices and constraints
@@ -617,12 +708,14 @@ http://localhost:3000/api/docs
 - [ ] Backup and recovery procedures
 
 **Deliverables:**
+
 - Live database schema
 - Migration scripts
 - Seed data for demo
 - Database documentation
 
 ### Phase 3: Core Accounting Services (Week 3-4)
+
 - [ ] Ledger module with posting engine
 - [ ] General accounting rules
 - [ ] Double-entry validation
@@ -630,12 +723,14 @@ http://localhost:3000/api/docs
 - [ ] Commission calculation engine
 
 **Deliverables:**
+
 - Ledger posting API (POST /ledger/entries)
 - Journal query API (GET /ledger/transactions)
 - Commission calculation service
 - Comprehensive Swagger documentation
 
 ### Phase 4: Operational Integration (Week 5)
+
 - [ ] Booking and Invoice modules
 - [ ] Customer and Supplier management
 - [ ] Payment gateway webhook handlers
@@ -643,12 +738,14 @@ http://localhost:3000/api/docs
 - [ ] Commission accrual automation
 
 **Deliverables:**
+
 - Booking creation flow
 - Invoice generation from bookings
 - Payment webhook processing
 - Real-time commission tracking
 
 ### Phase 5: Reporting & Analytics (Week 6)
+
 - [ ] KPI dashboard backend
 - [ ] Tax compliance reporting (SST/GST)
 - [ ] AR/AP aging analysis
@@ -656,12 +753,14 @@ http://localhost:3000/api/docs
 - [ ] FX impact reporting
 
 **Deliverables:**
+
 - Dashboard API (/reporting/dashboard)
 - Tax export API (/reporting/tax-export)
 - Frontend dashboard UI
 - Sample reports
 
 ### Phase 6: Testing, Performance & Deployment (Week 7+)
+
 - [ ] Unit and integration tests (>80% coverage)
 - [ ] Performance testing and optimization
 - [ ] Load testing with 10k+ concurrent users
@@ -672,6 +771,7 @@ http://localhost:3000/api/docs
 - [ ] Documentation and training materials
 
 **Deliverables:**
+
 - Test suite with high coverage
 - Docker images
 - Kubernetes manifests
@@ -693,12 +793,14 @@ PostgreSQL: >= 14.0
 ### Installation
 
 **Clone and setup:**
+
 ```bash
 cd d:\shakhawat\easy-task
 npm install
 ```
 
 **Backend setup:**
+
 ```bash
 cd backend
 npm install
@@ -706,6 +808,7 @@ npm run build
 ```
 
 **Frontend setup:**
+
 ```bash
 cd frontend
 npm install
@@ -715,6 +818,7 @@ npm run build
 ### Running Development Servers
 
 **Start Backend:**
+
 ```bash
 cd backend
 npm run start:dev
@@ -722,6 +826,7 @@ npm run start:dev
 ```
 
 **Start Frontend:**
+
 ```bash
 cd frontend
 npm run dev
@@ -754,6 +859,7 @@ npm run build
 ## 11. Project Completion Status
 
 ✅ **Completed:**
+
 - System architecture design document
 - Entity relationship diagram (Mermaid)
 - Transaction workflow diagram (Mermaid)
@@ -787,6 +893,7 @@ npm run build
 ### Multi-Currency Strategy
 
 The system supports AUD, MYR, and USD:
+
 - All transactions stored in original booking currency
 - FX conversion at invoice and reporting time
 - Daily rate table captures exchange rates
@@ -796,12 +903,14 @@ The system supports AUD, MYR, and USD:
 ### Compliance & Tax
 
 **Malaysia (SST):**
+
 - Sales and Service Tax
 - Applicable to local travel services
 - Tax rate configuration by supplier type
 - Self-assessment reporting readiness
 
 **Australia (GST):**
+
 - Goods and Service Tax
 - Threshold $75,000 AUD
 - Tax invoice requirements

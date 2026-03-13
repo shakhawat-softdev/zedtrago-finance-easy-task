@@ -65,6 +65,7 @@ The relational model centers around these core entities:
 - bookings
 - invoices
 - payments
+- payables
 - commissions
 - accounts
 - ledger_transactions
@@ -75,7 +76,7 @@ Normalization approach:
 
 - Master data such as users, customers, suppliers, and accounts is stored separately from transaction tables
 - Financial events are captured as immutable transactional records where possible
-- Many-to-one relations link bookings to customers and suppliers, invoices to bookings, and payments to invoices
+- Many-to-one relations link bookings to customers and suppliers, invoices to bookings, payments to invoices, and payables to suppliers and source bookings
 - Ledger transactions hold posting headers while entry lines hold debit and credit rows
 
 Transaction consistency:
