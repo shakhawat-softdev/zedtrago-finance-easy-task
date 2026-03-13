@@ -157,7 +157,9 @@ export function PaymentsPage() {
         toastSuccess("PayPal order created. Redirecting...");
         window.open(response.approvalUrl, "_blank", "noopener,noreferrer");
       } else {
-        toastWarning("Gateway checkout is available for Stripe and PayPal only");
+        toastWarning(
+          "Gateway checkout is available for Stripe and PayPal only",
+        );
         return;
       }
 

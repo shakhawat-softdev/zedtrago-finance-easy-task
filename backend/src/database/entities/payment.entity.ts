@@ -25,7 +25,9 @@ export class PaymentEntity {
   @ApiPropertyOptional({ example: "cs_test_a1b2c3" })
   gatewayReference?: string;
 
-  @ApiPropertyOptional({ example: "https://checkout.stripe.com/c/pay/cs_test_x" })
+  @ApiPropertyOptional({
+    example: "https://checkout.stripe.com/c/pay/cs_test_x",
+  })
   gatewayCheckoutUrl?: string;
 
   @ApiPropertyOptional({ example: "checkout.session.completed" })

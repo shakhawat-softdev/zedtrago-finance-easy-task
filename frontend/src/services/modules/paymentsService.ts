@@ -48,16 +48,17 @@ export const paymentsService = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Payments"],
     }),
-    createPayPalOrder: builder.mutation<PayPalOrderResponse, GatewayPaymentPayload>(
-      {
-        query: (body) => ({
-          url: "/payments/gateways/paypal/order",
-          method: "POST",
-          body,
-        }),
-        invalidatesTags: ["Payments"],
-      },
-    ),
+    createPayPalOrder: builder.mutation<
+      PayPalOrderResponse,
+      GatewayPaymentPayload
+    >({
+      query: (body) => ({
+        url: "/payments/gateways/paypal/order",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Payments"],
+    }),
     capturePayPalOrder: builder.mutation<PayPalCaptureResponse, string>({
       query: (orderId) => ({
         url: `/payments/gateways/paypal/capture/${orderId}`,

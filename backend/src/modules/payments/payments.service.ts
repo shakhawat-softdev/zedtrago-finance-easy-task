@@ -69,20 +69,26 @@ export class PaymentsService {
     formData.append("client_reference_id", payload.invoiceId);
     formData.append("line_items[0][quantity]", "1");
     formData.append("line_items[0][price_data][currency]", currency);
-    formData.append("line_items[0][price_data][unit_amount]", String(amountInMinor));
+    formData.append(
+      "line_items[0][price_data][unit_amount]",
+      String(amountInMinor),
+    );
     formData.append(
       "line_items[0][price_data][product_data][name]",
       `Invoice ${payload.invoiceId}`,
     );
 
-    const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${stripeSecretKey}`,
-        "Content-Type": "application/x-www-form-urlencoded",
+    const response = await fetch(
+      "https://api.stripe.com/v1/checkout/sessions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${stripeSecretKey}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData,
       },
-      body: formData,
-    });
+    );
 
     const data = await response.json();
     if (!response.ok) {
@@ -94,7 +100,9 @@ export class PaymentsService {
     const sessionId = String(data.id || "");
     const checkoutUrl = String(data.url || "");
     if (!sessionId || !checkoutUrl) {
-      throw new BadGatewayException("Stripe response missing checkout session URL");
+      throw new BadGatewayException(
+        "Stripe response missing checkout session URL",
+      );
     }
 
     this.upsertGatewayPayment({
@@ -162,12 +170,14 @@ export class PaymentsService {
 
     const orderId = String(data.id || "");
     const approvalUrl = String(
-      data.links?.find((link: { rel?: string }) => link.rel === "approve")?.href ||
-        "",
+      data.links?.find((link: { rel?: string }) => link.rel === "approve")
+        ?.href || "",
     );
 
     if (!orderId || !approvalUrl) {
-      throw new BadGatewayException("PayPal response missing order approval URL");
+      throw new BadGatewayException(
+        "PayPal response missing order approval URL",
+      );
     }
 
     this.upsertGatewayPayment({

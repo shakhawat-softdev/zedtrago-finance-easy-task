@@ -78,7 +78,9 @@ export class PaymentsController {
 
   @Post("gateways/stripe/checkout")
   @UseGuards(AuthTokenGuard)
-  @ApiOperation({ summary: "Create Stripe checkout session for invoice payment" })
+  @ApiOperation({
+    summary: "Create Stripe checkout session for invoice payment",
+  })
   @ApiBody({ type: CreateGatewayPaymentDto })
   @ApiOkResponse({
     schema: {

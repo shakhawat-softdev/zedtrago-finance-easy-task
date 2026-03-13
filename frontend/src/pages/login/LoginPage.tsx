@@ -8,6 +8,7 @@ type LoginPageProps = {
 export function LoginPage({ loading, onSubmit }: LoginPageProps) {
   const [email, setEmail] = useState("finance@zedtrago.com");
   const [password, setPassword] = useState("Passw0rd!");
+  const [rememberMe, setRememberMe] = useState(true);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -27,12 +28,23 @@ export function LoginPage({ loading, onSubmit }: LoginPageProps) {
             <span className="auth-security-pill">Secure Access</span>
           </div>
           <h2>
-            Professional finance workspace for multi-service travel operations.
+            Finance operations workspace for high-volume travel businesses.
           </h2>
           <p>
-            Access live booking, invoice, payment, and supplier workflows from a
-            streamlined control surface connected to the backend API.
+            Access receivables, payables, reconciliations, and compliance
+            reporting from a secure control center connected to live operational
+            data.
           </p>
+          <div className="auth-stat-row">
+            <div className="auth-stat">
+              <span>Settlement Visibility</span>
+              <strong>Live Gateway and Ledger Sync</strong>
+            </div>
+            <div className="auth-stat">
+              <span>Tax Readiness</span>
+              <strong>SST and GST Coverage</strong>
+            </div>
+          </div>
         </div>
 
         <div className="auth-grid">
@@ -48,6 +60,7 @@ export function LoginPage({ loading, onSubmit }: LoginPageProps) {
               type="email"
               placeholder="finance@zedtrago.com"
               required
+              autoComplete="email"
             />
             <label>Password</label>
             <input
@@ -56,17 +69,37 @@ export function LoginPage({ loading, onSubmit }: LoginPageProps) {
               type="password"
               placeholder="Enter your password"
               required
+              autoComplete="current-password"
             />
+
+            <div className="auth-row-inline">
+              <label className="auth-checkbox-label" htmlFor="remember-me">
+                <input
+                  id="remember-me"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+                Keep me signed in on this device
+              </label>
+              <span className="auth-help-text">Need help? Contact Admin</span>
+            </div>
+
             <button className="btn" type="submit" disabled={loading}>
               {loading ? "Signing in..." : "Enter Workspace"}
             </button>
+
+            <p className="auth-footnote">
+              Protected with token-based authentication and role-aware access
+              control.
+            </p>
           </div>
 
           <aside className="auth-note">
             <h3>Finance Command Center</h3>
             <p>
-              Centralize receivables, payables, reconciliations, and reporting
-              with a secure workspace designed for daily finance operations.
+              Built for finance teams that operate across bookings, invoicing,
+              collections, supplier settlements, and audit workflows.
             </p>
 
             <div className="auth-credential">

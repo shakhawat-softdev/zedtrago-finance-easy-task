@@ -37,7 +37,9 @@ export class CreatePaymentDto {
   @IsString()
   gatewayReference?: string;
 
-  @ApiPropertyOptional({ example: "https://checkout.stripe.com/c/pay/cs_test_x" })
+  @ApiPropertyOptional({
+    example: "https://checkout.stripe.com/c/pay/cs_test_x",
+  })
   @IsOptional()
   @IsUrl()
   gatewayCheckoutUrl?: string;
