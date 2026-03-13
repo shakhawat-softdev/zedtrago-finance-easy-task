@@ -131,6 +131,16 @@ npm install
 npm run start:dev --workspace backend
 ```
 
+Before starting the backend for gateway flows, configure these variables in [backend/.env.example](backend/.env.example):
+
+```env
+FRONTEND_BASE_URL=http://localhost:5173
+STRIPE_SECRET_KEY=sk_test_xxx
+PAYPAL_MODE=sandbox
+PAYPAL_CLIENT_ID=your_paypal_client_id
+PAYPAL_CLIENT_SECRET=your_paypal_client_secret
+```
+
 ### 3. Start frontend
 
 ```bash
@@ -154,6 +164,23 @@ Use this sample login payload:
 ```
 
 The returned bearer token can be used for protected endpoints.
+
+## Payment Gateway Integration
+
+Stripe and PayPal are now integrated on both backend and frontend.
+
+Backend endpoints:
+
+- `POST /api/payments/gateways/stripe/checkout`
+- `POST /api/payments/gateways/paypal/order`
+- `POST /api/payments/gateways/paypal/capture/:orderId`
+- `POST /api/payments/webhooks/stripe`
+- `POST /api/payments/webhooks/paypal`
+
+Frontend behavior:
+
+- Payments page supports starting Stripe checkout or PayPal approval from the add-payment modal.
+- Pending PayPal entries can be captured from the Payments table using the Capture action.
 
 ## Documentation Folder
 

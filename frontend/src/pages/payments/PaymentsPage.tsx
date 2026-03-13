@@ -1,7 +1,10 @@
 import { FormEvent, useState } from "react";
 import { CommonDataTable } from "../../utils/CommonDataTable";
 import {
+  useCapturePayPalOrderMutation,
   useCreatePaymentMutation,
+  useCreatePayPalOrderMutation,
+  useCreateStripeCheckoutMutation,
   useDeletePaymentMutation,
   useGetInvoicesQuery,
   useGetPaymentsQuery,
@@ -27,6 +30,12 @@ export function PaymentsPage() {
   const { data: invoices = [] } = useGetInvoicesQuery();
   const [createPayment, { isLoading: creating }] = useCreatePaymentMutation();
   const [updatePayment, { isLoading: updating }] = useUpdatePaymentMutation();
+  const [createStripeCheckout, { isLoading: creatingStripeCheckout }] =
+    useCreateStripeCheckoutMutation();
+  const [createPayPalOrder, { isLoading: creatingPayPalOrder }] =
+    useCreatePayPalOrderMutation();
+  const [capturePayPalOrder, { isLoading: capturingPayPalOrder }] =
+    useCapturePayPalOrderMutation();
   const [deletePayment] = useDeletePaymentMutation();
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [form, setForm] = useState({
@@ -116,6 +125,60 @@ export function PaymentsPage() {
       refetch();
     } catch {
       toastError("Failed to delete payment");
+    }
+  }
+
+  async function onStartGatewayCheckout() {
+    const amount = Number(form.amount);
+    if (!form.invoiceId) {
+      toastWarning("Please select an invoice first");
+      return;
+    }
+    if (!Number.isFinite(amount) || amount <= 0) {
+      toastWarning("Please enter a valid amount");
+      return;
+    }
+
+    try {
+      if (form.provider === "stripe") {
+        const response = await createStripeCheckout({
+          invoiceId: form.invoiceId,
+          amount,
+          currency: form.currency,
+        }).unwrap();
+        toastSuccess("Stripe checkout created. Redirecting...");
+        window.open(response.checkoutUrl, "_blank", "noopener,noreferrer");
+      } else if (form.provider === "paypal") {
+        const response = await createPayPalOrder({
+          invoiceId: form.invoiceId,
+          amount,
+          currency: form.currency,
+        }).unwrap();
+        toastSuccess("PayPal order created. Redirecting...");
+        window.open(response.approvalUrl, "_blank", "noopener,noreferrer");
+      } else {
+        toastWarning("Gateway checkout is available for Stripe and PayPal only");
+        return;
+      }
+
+      refetch();
+    } catch {
+      toastError("Failed to initialize gateway checkout");
+    }
+  }
+
+  async function onCapturePayPal(payment: Payment) {
+    if (!payment.gatewayReference) {
+      toastWarning("No PayPal order reference is available for this payment");
+      return;
+    }
+
+    try {
+      await capturePayPalOrder(payment.gatewayReference).unwrap();
+      toastSuccess("PayPal payment captured successfully");
+      refetch();
+    } catch {
+      toastError("Failed to capture PayPal payment");
     }
   }
 
@@ -220,9 +283,23 @@ export function PaymentsPage() {
             onChange={(e) => setForm({ ...form, receivedAt: e.target.value })}
             required
           />
-          <button className="btn" type="submit" disabled={creating}>
-            {creating ? "Saving..." : "Add Payment"}
-          </button>
+          <div className="actions-inline">
+            <button className="btn" type="submit" disabled={creating}>
+              {creating ? "Saving..." : "Add Payment"}
+            </button>
+            {(form.provider === "stripe" || form.provider === "paypal") && (
+              <button
+                className="btn ghost"
+                type="button"
+                onClick={onStartGatewayCheckout}
+                disabled={creatingStripeCheckout || creatingPayPalOrder}
+              >
+                {creatingStripeCheckout || creatingPayPalOrder
+                  ? "Starting..."
+                  : `Start ${form.provider === "stripe" ? "Stripe" : "PayPal"} Checkout`}
+              </button>
+            )}
+          </div>
         </form>
       </FormModal>
 
@@ -347,6 +424,16 @@ export function PaymentsPage() {
               header: "Actions",
               render: (row) => (
                 <div className="actions-inline">
+                  {row.provider === "paypal" && row.status === "pending" ? (
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => onCapturePayPal(row)}
+                      disabled={capturingPayPalOrder}
+                    >
+                      {capturingPayPalOrder ? "Capturing..." : "Capture"}
+                    </button>
+                  ) : null}
                   <button
                     className="btn ghost"
                     type="button"

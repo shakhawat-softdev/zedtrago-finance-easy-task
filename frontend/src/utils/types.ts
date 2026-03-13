@@ -57,6 +57,38 @@ export type Payment = {
   currency: string;
   amount: number;
   receivedAt: string;
+  gatewayReference?: string;
+  gatewayCheckoutUrl?: string;
+  lastWebhookEvent?: string;
+};
+
+export type GatewayPaymentPayload = {
+  invoiceId: string;
+  amount: number;
+  currency: string;
+  successUrl?: string;
+  cancelUrl?: string;
+  returnUrl?: string;
+};
+
+export type StripeCheckoutResponse = {
+  provider: "stripe";
+  sessionId: string;
+  checkoutUrl: string;
+};
+
+export type PayPalOrderResponse = {
+  provider: "paypal";
+  orderId: string;
+  approvalUrl: string;
+  status: string;
+};
+
+export type PayPalCaptureResponse = {
+  provider: "paypal";
+  orderId: string;
+  status: string;
+  paymentId?: string;
 };
 
 export type Supplier = {

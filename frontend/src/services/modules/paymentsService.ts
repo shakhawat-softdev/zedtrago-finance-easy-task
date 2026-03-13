@@ -1,5 +1,12 @@
 import { baseApi } from "../baseApi";
-import type { Payment, DeleteResponse } from "../../utils/types";
+import type {
+  DeleteResponse,
+  GatewayPaymentPayload,
+  PayPalCaptureResponse,
+  PayPalOrderResponse,
+  Payment,
+  StripeCheckoutResponse,
+} from "../../utils/types";
 
 export const paymentsService = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -30,6 +37,34 @@ export const paymentsService = baseApi.injectEndpoints({
       query: (id) => ({ url: `/payments/${id}`, method: "DELETE" }),
       invalidatesTags: ["Payments"],
     }),
+    createStripeCheckout: builder.mutation<
+      StripeCheckoutResponse,
+      GatewayPaymentPayload
+    >({
+      query: (body) => ({
+        url: "/payments/gateways/stripe/checkout",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Payments"],
+    }),
+    createPayPalOrder: builder.mutation<PayPalOrderResponse, GatewayPaymentPayload>(
+      {
+        query: (body) => ({
+          url: "/payments/gateways/paypal/order",
+          method: "POST",
+          body,
+        }),
+        invalidatesTags: ["Payments"],
+      },
+    ),
+    capturePayPalOrder: builder.mutation<PayPalCaptureResponse, string>({
+      query: (orderId) => ({
+        url: `/payments/gateways/paypal/capture/${orderId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Payments"],
+    }),
   }),
 });
 
@@ -39,4 +74,7 @@ export const {
   useCreatePaymentMutation,
   useUpdatePaymentMutation,
   useDeletePaymentMutation,
+  useCreateStripeCheckoutMutation,
+  useCreatePayPalOrderMutation,
+  useCapturePayPalOrderMutation,
 } = paymentsService;
